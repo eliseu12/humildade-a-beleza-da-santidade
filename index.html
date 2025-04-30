@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Player de Áudio Responsivo</title>
+  <style>
+    body {
+      background-color: #000;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      min-height: 100vh;
+    }
+
+    .cover {
+      width: 100%;
+      max-width: 300px;
+      margin-bottom: 20px;
+    }
+    .cover img {
+      width: 100%;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+    }
+
+    .player {
+      width: 100%;
+      max-width: 400px;
+      background-color: #111;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .track-title {
+      font-size: 18px;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 15px;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 30px;
+      margin-top: 10px;
+    }
+
+    .control-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      width: 70px;
+      height: 70px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s;
+    }
+    .control-btn:hover {
+      transform: scale(1.1);
+    }
+    .control-btn svg {
+      width: 40px;
+      height: 40px;
+      fill: white;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background-color: #333;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 20px;
+      cursor: pointer;
+      position: relative;
+    }
+    .progress {
+      height: 100%;
+      background: linear-gradient(90deg, white 0%, #777 100%);
+      width: 0%;
+      transition: width 0.2s linear;
+    }
+
+    .time-info {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #aaa;
+      margin-top: 5px;
+    }
+
+    .playlist {
+      margin-top: 20px;
+      width: 100%;
+    }
+    .playlist-item {
+      padding: 14px 10px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      border-bottom: 1px solid #333;
+      text-align: left;
+      font-size: 16px;
+      line-height: 1.4;
+    }
+    .playlist-item:hover {
+      background-color: #222;
+    }
+    .playlist-item.active {
+      background-color: #333;
+    }
+
+    @media (max-width: 400px) {
+      .control-btn {
+        width: 60px;
+        height: 60px;
+      }
+      .control-btn svg {
+        width: 36px;
+        height: 36px;
+      }
+      .track-title {
+        font-size: 16px;
+      }
+      .playlist-item {
+        font-size: 14px;
+        padding: 12px 8px;
+        margin-bottom: 6px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="cover">
+    <img id="cover-image" src="https://www.flickr.com/photos/195681414@N04/54488171468/in/dateposted-public/" alt="Capa do Álbum" />
+  </div>
+
+  <div class="player">
+    <div class="track-title" id="track-title">Selecione um Capítulo</div>
+
+    <div class="controls">
+      <button id="prev-btn" class="control-btn" title="Anterior">
+        <svg viewBox="0 0 24 24"><path d="M18 20l-8.5-8L18 4v16zM6 4h2v16H6V4z"/></svg>
+      </button>
+      <button id="play-btn" class="control-btn" title="Play/Pause">
+        <svg id="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        <svg id="pause-icon" viewBox="0 0 24 24" style="display: none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+      </button>
+      <button id="next-btn" class="control-btn" title="Próxima">
+        <svg viewBox="0 0 24 24"><path d="M6 4l8.5 8L6 20V4zm9 0h2v16h-2V4z"/></svg>
+      </button>
+    </div>
+
+    <div class="progress-bar" id="progress-bar">
+      <div class="progress" id="progress"></div>
+    </div>
+
+    <div class="time-info">
+      <span id="current-time">00:00</span>
+      <span id="total-time">00:00</span>
+    </div>
+
+    <audio id="audio-player">Seu navegador não suporta o elemento de áudio.</audio>
+
+    <div class="playlist" id="playlist">
+      <div class="playlist-item" data-src="https://archive.org/download/6_20250430_20250430/1.MP3" data-title="Humildade: A glória da criatura">1 - Humildade: A glória da criatura</div>
+      <div class="playlist-item" data-src="https://archive.org/download/6_20250430_20250430/2.MP3" data-title="Humildade: O segredo da redenção">2 - Humildade: O segredo da redenção</div>
+      <div class="playlist-item" data-src="https://archive.org/download/6_20250430_20250430/3.MP3" data-title="A Humildade de Jesus">3 - A Humildade de Jesus</div>
+      <div class="playlist-item" data-src="https://archive.org/download/6_20250430_20250430/4.MP3" data-title="Humildade no ensinamento de Jesus">4 - Humildade no ensinamento de Jesus</div>
+      <div class="playlist-item" data-src="https://archive.org/download/6_20250430_20250430/5.MP3" data-title="Humildade nos discípulos de Jesus">5 - Humildade nos discípulos de Jesus</div>
+      <div class="playlist-item" data-src="https://archive.org/download/6_20250430_20250430/6.MP3" data-title="Humildade na vida cotidiana">6 - Humildade na vida cotidiana</div>
+      <div class="playlist-item" data-src="https://archive.org/download/6_20250430_20250430/7.MP3" data-title="Humildade e santitade">7 - Humildade e santitade</div>
+      <div class="playlist-item" data-src="https://archive.org/download/6_20250430_20250430/8.MP3" data-title="Humildade e pecado">8 - Humildade e pecado</div>
+      <div class="playlist-item" data-src="https://archive.org/download/6_20250430_20250430/9.MP3" data-title="Humildade e fé">9 - Humildade e fé</div>
+      <div class="playlist-item" data-src="https://archive.org/download/6_20250430_20250430/10.MP3" data-title="Humildade e a morte de si próprio">10 - Humildade e a morte de si próprio</div>
+      <div class="playlist-item" data-src="https://archive.org/download/6_20250430_20250430/11.MP3" data-title="Humildade e felicidade">11 - Humildade e felicidade</div>
+      <div class="playlist-item" data-src="https://archive.org/download/6_20250430_20250430/12.MP3" data-title="Humildade e exaltação">12 - Humildade e exaltação</div>
+      <div class="playlist-item" data-src="https://archive.org/download/6_20250430_20250430/13.MP3" data-title="Uma oração por humildade">13 - Uma oração por humildade</div>
+    </div>
+  </div>
+
+  <script>
+    const audioPlayer = document.getElementById('audio-player');
+    const playBtn = document.getElementById('play-btn');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const trackTitle = document.getElementById('track-title');
+    const playlistItems = document.querySelectorAll('.playlist-item');
+    const progressBar = document.getElementById('progress-bar');
+    const progress = document.getElementById('progress');
+    const playIcon = document.getElementById('play-icon');
+    const pauseIcon = document.getElementById('pause-icon');
+    const currentTimeDisplay = document.getElementById('current-time');
+    const totalTimeDisplay = document.getElementById('total-time');
+
+    let isPlaying = false;
+    let currentIndex = 0;
+    const tracks = Array.from(playlistItems);
+
+    function formatTime(seconds) {
+      const mins = Math.floor(seconds / 60);
+      const secs = Math.floor(seconds % 60);
+      return `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+    }
+
+    function loadTrack(index) {
+      tracks.forEach(el => el.classList.remove('active'));
+      const item = tracks[index];
+      item.classList.add('active');
+      audioPlayer.src = item.dataset-src;
+      trackTitle.textContent = item.dataset-title;
+    }
+
+    function playPause() {
+      if (!audioPlayer.src) return;
+      isPlaying ? audioPlayer.pause() : audioPlayer.play();
+    }
+
+    playBtn.addEventListener('click', playPause);
+    prevBtn.addEventListener('click', () => {
+      currentIndex = (currentIndex - 1 + tracks.length) % tracks.length; loadTrack(currentIndex); audioPlayer.play();
+    });
+    nextBtn.addEventListener('click', () => {
+      currentIndex = (currentIndex + 1) % tracks.length; loadTrack(currentIndex); audioPlayer.play();
+    });
+
+    audioPlayer.addEventListener('play', () => {
+      isPlaying = true; playIcon.style.display = 'none'; pauseIcon.style.display = 'inline';
+    });
+    audioPlayer.addEventListener('pause', () => {
+      isPlaying = false; playIcon.style.display = 'inline'; pauseIcon.style.display = 'none';
+    });
+
+    audioPlayer.addEventListener('loadedmetadata', () => {
+      totalTimeDisplay.textContent = formatTime(audioPlayer.duration);
+    });
+    audioPlayer.addEventListener('timeupdate', () => {
+      if (!audioPlayer.duration) return;
+      const percent = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+      progress.style.width = percent + '%';
+      currentTimeDisplay.textContent = formatTime(audioPlayer.currentTime);
+    });
+    audioPlayer.addEventListener('ended', () => {
+      currentIndex = (currentIndex + 1) % tracks.length; loadTrack(currentIndex); audioPlayer.play();
+    });
+
+    progressBar.addEventListener('click', e => {
+      const rect = progressBar.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      audioPlayer.currentTime = (clickX / rect.width) * audioPlayer.duration;
+    });
+
+    playlistItems.forEach((item, idx) => {
+      item.addEventListener('click', () => {
+        currentIndex = idx; loadTrack(currentIndex); audioPlayer.play();
+      });
+    });
+  </script>
+
+</body>
+</html>
