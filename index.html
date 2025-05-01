@@ -114,12 +114,8 @@
       font-size: 16px;
       line-height: 1.4;
     }
-    .playlist-item:hover {
-      background-color: #222;
-    }
-    .playlist-item.active {
-      background-color: #333;
-    }
+    .playlist-item:hover { background-color: #222; }
+    .playlist-item.active { background-color: #333; }
 
     @media (max-width: 400px) {
       .control-btn {
@@ -156,14 +152,22 @@
 
     <div class="controls">
       <button id="prev-btn" class="control-btn" title="Anterior">
-        <svg viewBox="0 0 24 24"><path d="M18 20l-8.5-8L18 4v16zM6 4h2v16H6V4z"/></svg>
+        <svg viewBox="0 0 24 24">
+          <path d="M18 20l-8.5-8L18 4v16zM6 4h2v16H6V4z"/>
+        </svg>
       </button>
       <button id="play-btn" class="control-btn" title="Play/Pause">
-        <svg id="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-        <svg id="pause-icon" viewBox="0 0 24 24" style="display: none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+        <svg id="play-icon" viewBox="0 0 24 24">
+          <path d="M8 5v14l11-7z"/>
+        </svg>
+        <svg id="pause-icon" viewBox="0 0 24 24" style="display: none;">
+          <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+        </svg>
       </button>
       <button id="next-btn" class="control-btn" title="Próxima">
-        <svg viewBox="0 0 24 24"><path d="M6 4l8.5 8L6 20V4zm9 0h2v16h-2V4z"/></svg>
+        <svg viewBox="0 0 24 24">
+          <path d="M6 4l8.5 8L6 20V4zm9 0h2v16h-2V4z"/>
+        </svg>
       </button>
     </div>
 
@@ -224,63 +228,65 @@
   </div>
 
   <script>
-    const audioPlayer = document.getElementById('audio-player');
-    const playBtn = document.getElementById('play-btn');
-    const prevBtn = document.getElementById('prev-btn');
-    const nextBtn = document.getElementById('next-btn');
-    const trackTitle = document.getElementById('track-title');
-    const playlistItems = document.querySelectorAll('.playlist-item');
-    const progressBar = document.getElementById('progress-bar');
-    const progress = document.getElementById('progress');
-    const playIcon = document.getElementById('play-icon');
-    const pauseIcon = document.getElementById('pause-icon');
-    const currentTimeDisplay = document.getElementById('current-time');
-    const totalTimeDisplay = document.getElementById('total-time');
+    const audioPlayer       = document.getElementById('audio-player');
+    const playBtn           = document.getElementById('play-btn');
+    const prevBtn           = document.getElementById('prev-btn');
+    const nextBtn           = document.getElementById('next-btn');
+    const trackTitle        = document.getElementById('track-title');
+    const playlistItems     = document.querySelectorAll('.playlist-item');
+    const progressBar       = document.getElementById('progress-bar');
+    const progress          = document.getElementById('progress');
+    const playIcon          = document.getElementById('play-icon');
+    const pauseIcon         = document.getElementById('pause-icon');
+    const currentTimeDisplay= document.getElementById('current-time');
+    const totalTimeDisplay  = document.getElementById('total-time');
 
-    let isPlaying = false;
+    let isPlaying    = false;
     let currentIndex = 0;
-    const tracks = Array.from(playlistItems);
+    const tracks     = Array.from(playlistItems);
 
-    function formatTime(seconds) {
-      const mins = Math.floor(seconds / 60);
-      const secs = Math.floor(seconds % 60);
-      return `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+    function formatTime(sec) {
+      const m = Math.floor(sec/60);
+      const s = Math.floor(sec%60);
+      return String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
     }
 
-    function loadTrack(index) {
-      tracks.forEach(el => el.classList.remove('active'));
-      const item = tracks[index];
+    function loadTrack(i) {
+      tracks.forEach(t => t.classList.remove('active'));
+      const item = tracks[i];
       item.classList.add('active');
       audioPlayer.src = item.dataset.src;
       trackTitle.textContent = item.dataset.title;
+      currentIndex = i;
     }
 
     function playPause() {
-      if (!audioPlayer.src) return;
+      if (!audioPlayer.src) {
+        loadTrack(0);
+      }
       isPlaying ? audioPlayer.pause() : audioPlayer.play();
     }
 
     playBtn.addEventListener('click', playPause);
+
     prevBtn.addEventListener('click', () => {
-      currentIndex = (currentIndex - 1 + tracks.length) % tracks.length;
-      loadTrack(currentIndex);
+      loadTrack((currentIndex - 1 + tracks.length) % tracks.length);
       audioPlayer.play();
     });
     nextBtn.addEventListener('click', () => {
-      currentIndex = (currentIndex + 1) % tracks.length;
-      loadTrack(currentIndex);
+      loadTrack((currentIndex + 1) % tracks.length);
       audioPlayer.play();
     });
 
     audioPlayer.addEventListener('play', () => {
       isPlaying = true;
       playIcon.style.display = 'none';
-      pauseIcon.style.display = 'inline';
+      pauseIcon.style.display= 'inline';
     });
     audioPlayer.addEventListener('pause', () => {
       isPlaying = false;
       playIcon.style.display = 'inline';
-      pauseIcon.style.display = 'none';
+      pauseIcon.style.display= 'none';
     });
 
     audioPlayer.addEventListener('loadedmetadata', () => {
@@ -288,26 +294,24 @@
     });
     audioPlayer.addEventListener('timeupdate', () => {
       if (!audioPlayer.duration) return;
-      const percent = (audioPlayer.currentTime / audioPlayer.duration) * 100;
-      progress.style.width = percent + '%';
+      const pct = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+      progress.style.width = pct + '%';
       currentTimeDisplay.textContent = formatTime(audioPlayer.currentTime);
     });
     audioPlayer.addEventListener('ended', () => {
-      currentIndex = (currentIndex + 1) % tracks.length;
-      loadTrack(currentIndex);
+      loadTrack((currentIndex + 1) % tracks.length);
       audioPlayer.play();
     });
 
     progressBar.addEventListener('click', e => {
       const rect = progressBar.getBoundingClientRect();
-      const clickX = e.clientX - rect.left;
-      audioPlayer.currentTime = (clickX / rect.width) * audioPlayer.duration;
+      const x = e.clientX - rect.left;
+      audioPlayer.currentTime = (x / rect.width) * audioPlayer.duration;
     });
 
     playlistItems.forEach((item, idx) => {
       item.addEventListener('click', () => {
-        currentIndex = idx;
-        loadTrack(currentIndex);
+        loadTrack(idx);
         audioPlayer.play();
       });
     });
