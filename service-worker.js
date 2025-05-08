@@ -1,4 +1,6 @@
-const CACHE_NAME = 'audio-player-v1';
+// service-worker.js
+
+const CACHE_NAME = 'audio-player-v2';
 const ASSETS = [
   '/',
   '/index.html',
@@ -18,10 +20,54 @@ const ASSETS = [
   'https://archive.org/download/6_20250430_20250430/13.MP3'
 ];
 
+// Durante a instalação, tentamos adicionar tudo — mas não falhamos o install se algum asset der erro.
 self.addEventListener('install', event => {
-  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)));
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(cache =>
+      Promise.all(
+        ASSETS.map(url =>
+          fetch(url)
+            .then(response => {
+              if (!response.ok) throw new Error(`Status ${response.status} em ${url}`);
+              return cache.put(url, response);
+            })
+            .catch(err => {
+              console.warn('Falha ao cachear', url, err);
+              // continua mesmo que este asset específico falhe
+            })
+        )
+      )
+    )
+  );
 });
 
+// Ao ativar, removemos caches com nome diferente do atual
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(
+        keys
+          .filter(key => key !== CACHE_NAME)
+          .map(oldKey => caches.delete(oldKey))
+      )
+    )
+  );
+});
+
+// Intercepta requisições:
+// 1) Se for navegação (modo 'navigate'), tenta pelo network e cai para index.html offline.
+// 2) Caso contrário, tenta cache primeiro, depois network.
 self.addEventListener('fetch', event => {
-  event.respondWith(caches.match(event.request).then(resp => resp || fetch(event.request)));
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request)
+        .catch(() => caches.match('/index.html'))
+    );
+  } else {
+    event.respondWith(
+      caches.match(event.request).then(cached => 
+        cached || fetch(event.request)
+      )
+    );
+  }
 });
