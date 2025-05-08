@@ -4,8 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Humildade a Beleza da Santidade</title>
-  <link rel="icon" id="favicon" href="https://live.staticflickr.com/65535/54488171468_d37b7e80c9_n.jpg" sizes="300x300" type="image/jpeg">
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="icon" id="favicon"
+        href="https://live.staticflickr.com/65535/54488171468_d37b7e80c9_n.jpg"
+        sizes="300x300" type="image/jpeg">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+        rel="stylesheet">
 
   <style>
     body {
@@ -25,11 +28,13 @@
     }
     .cover img {
       width: 100%; border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.5), 0 0 20px #fff, 0 0 40px #fff;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5),
+                  0 0 20px #fff, 0 0 40px #fff;
       transition: box-shadow .3s ease;
     }
     .cover img:hover {
-      box-shadow: 0 4px 12px rgba(0,0,0,0.5), 0 0 30px #fff, 0 0 60px #fff;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5),
+                  0 0 30px #fff, 0 0 60px #fff;
     }
     .player {
       width: 100%; max-width: 500px;
@@ -41,18 +46,20 @@
     }
     .track-header {
       display: flex; flex-direction: column;
-      width: 100%; margin-bottom: 15px; text-align: center;
+      width: 100%; margin-bottom: 15px;
+      text-align: center;
     }
     .track-title-container {
       position: relative;
     }
     .track-title {
       font-size: 20px; font-weight: bold;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-      padding: 0 30px;
+      white-space: nowrap; overflow: hidden;
+      text-overflow: ellipsis; padding: 0 30px;
     }
     .album-title {
-      font-size: 14px; color: #aaa; margin-top: 5px;
+      font-size: 14px; color: #aaa;
+      margin-top: 5px;
     }
     .menu-btn {
       background: none; border: none; color: white;
@@ -60,14 +67,16 @@
       position: absolute; right: 0; top: 0;
     }
     .menu {
-      position: absolute; background: #222; border-radius: 8px;
-      padding: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-      z-index: 100; display: none; right: 20px; top: 60px;
-      max-width: 300px;
+      position: absolute; background: #222;
+      border-radius: 8px; padding: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+      z-index: 100; display: none;
+      right: 20px; top: 60px; max-width: 300px;
     }
     .menu-item {
-      padding: 8px 12px; cursor: pointer; border-radius: 4px;
-      display: flex; align-items: center; gap: 8px;
+      padding: 8px 12px; cursor: pointer;
+      border-radius: 4px; display: flex;
+      align-items: center; gap: 8px;
     }
     .menu-item:hover { background: #444; }
     .submenu {
@@ -87,9 +96,9 @@
     .control-btn {
       background: none; border: none;
       width: 60px; height: 60px; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      border-radius: 50%; outline: none;
-      transition: box-shadow .2s, transform .2s;
+      display: flex; align-items: center;
+      justify-content: center; border-radius: 50%;
+      outline: none; transition: box-shadow .2s, transform .2s;
     }
     .control-btn:hover {
       transform: scale(1.1);
@@ -103,9 +112,8 @@
       width: 100%; margin-top: 10px;
     }
     .progress-bar {
-      flex: 1; height: 6px;
-      background: #333; border-radius: 4px;
-      cursor: pointer; overflow: hidden;
+      flex: 1; height: 6px; background: #333;
+      border-radius: 4px; cursor: pointer; overflow: hidden;
     }
     .progress {
       height: 100%; background: #fff;
@@ -114,8 +122,8 @@
     .speed-control { margin-left: 10px; }
     .speed-control select {
       background: #111; border: 1px solid #444;
-      color: #fff; padding: 4px;
-      border-radius: 4px; cursor: pointer;
+      color: #fff; padding: 4px; border-radius: 4px;
+      cursor: pointer;
     }
     .time-info {
       width: 100%; display: flex;
@@ -124,31 +132,35 @@
       margin-top: 5px;
     }
     .playlist {
-      margin-top: 20px; width: 100%; max-height: 200px;
-      overflow-y: auto;
+      margin-top: 20px; width: 100%;
+      max-height: 200px; overflow-y: auto;
     }
     .playlist-item {
       padding: 10px; border-bottom: 1px solid #444;
       cursor: pointer; color: #ccc;
     }
-    .playlist-item.active { background: #222; color: #fff; }
+    .playlist-item.active {
+      background: #222; color: #fff;
+    }
     .playlist-item:hover { background: #333; }
 
-    /* Estilos para compartilhamento */
+    /* Compartilhamento */
+    .overlay, .share-dialog { display: none; }
+    .overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.7); z-index: 999;
+    }
     .share-dialog {
-      display: none; position: fixed;
-      top: 50%; left: 50%;
+      position: fixed; top: 50%; left: 50%;
       transform: translate(-50%, -50%);
       background: #222; padding: 20px;
       border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);
       z-index: 1000; width: 90%; max-width: 400px;
     }
-    .share-dialog h3 {
-      margin-top: 0; color: #fff;
-    }
+    .share-dialog h3 { margin-top: 0; color: #fff; }
     .share-options {
-      display: flex; flex-wrap: wrap;
-      gap: 10px; margin: 15px 0;
+      display: flex; flex-wrap: wrap; gap: 10px;
+      margin: 15px 0;
     }
     .share-option {
       display: flex; flex-direction: column;
@@ -157,34 +169,27 @@
       font-size: 12px; width: 60px;
     }
     .share-icon {
-      width: 40px; height: 40px;
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      margin-bottom: 5px; transition: transform 0.2s;
+      width: 40px; height: 40px; border-radius: 50%;
+      display: flex; align-items: center;
+      justify-content: center; margin-bottom: 5px;
+      transition: transform 0.2s;
     }
     .share-icon:hover { transform: scale(1.1); }
-    .share-icon svg {
-      width: 24px; height: 24px; fill: white;
-    }
+    .share-icon svg { width: 24px; height: 24px; fill: white; }
     .whatsapp-icon { background-color: #25D366; }
     .facebook-icon { background-color: #1877F2; }
-    .twitter-icon { background-color: #000000; }
+    .twitter-icon { background-color: #000; }
     .email-icon { background-color: #EA4335; }
     .link-icon { background-color: #5f6368; }
     .share-link {
       width: 100%; padding: 8px; background: #333;
-      border: none; border-radius: 4px;
-      color: #fff; margin-top: 10px;
+      border: none; border-radius: 4px; color: #fff;
+      margin-top: 10px;
     }
     .close-share {
       position: absolute; top: 10px; right: 10px;
-      background: none; border: none;
-      color: #aaa; font-size: 20px; cursor: pointer;
-    }
-    .overlay {
-      display: none; position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.7); z-index: 999;
+      background: none; border: none; color: #aaa;
+      font-size: 20px; cursor: pointer;
     }
 
     @media (max-width: 400px) {
@@ -197,65 +202,65 @@
   <!-- Ícones SVG para compartilhamento -->
   <svg style="display: none;">
     <symbol id="whatsapp-icon" viewBox="0 0 24 24">
-      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03
-      -.967-.273-.099-.471-.148-.67.15-.197.297-.767.966
-      -.94 1.164-.173.199-.347.223-.644.075-.297-.15
-      -1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653
-      -2.059-.173-.297-.018-.458.13-.606.134-.133.298
-      -.347.446-.52.149-.174.198-.298.298-.497.099-.198
-      .05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207
-      -.242-.579-.487-.5-.669-.51-.173-.008-.371-.01
-      -.57-.01-.198 0-.52.074-.792.372-.272.297-1.04
-      1.016-1.04 2.479 0 1.462 1.065 2.875 1.213
-      3.074.149.198 2.096 3.2 5.077 4.487.709.306
-      1.262.489 1.694.625.712.227 1.36.195 1.871.118
-      .571-.085 1.758-.719 2.006-1.413.248-.694.248
-      -1.289.173-1.413-.074-.124-.272-.198-.57
-      -.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031
-      -1.378l-.361-.214-3.741.982.998-3.648-.235
-      -.374a9.86 9.86 0 01-1.51-5.26c.001-5.45
-      4.436-9.884 9.888-9.884 2.64 0 5.122 1.03
-      6.988 2.898a9.825 9.825 0 012.893 6.994c
-      -.003 5.45-4.437 9.884-9.885 9.884m8.413
-      -18.297A11.815 11.815 0 0012.05 0C5.495 0
-      .16 5.335.157 11.892c0 2.096.547 4.142
-      1.588 5.945L.057 24l6.305-1.654a11.882
-      11.882 0 005.683 1.448h.005c6.554 0
-      11.89-5.335 11.893-11.893a11.821
-      11.821 0 00-3.48-8.413z"/>
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967
+        -.273-.099-.471-.148-.67.15-.197.297-.767.966
+        -.94 1.164-.173.199-.347.223-.644.075-.297-.15
+        -1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653
+        -2.059-.173-.297-.018-.458.13-.606.134-.133.298
+        -.347.446-.52.149-.174.198-.298.298-.497.099-.198
+        .05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207
+        -.242-.579-.487-.5-.669-.51-.173-.008-.371-.01
+        -.57-.01-.198 0-.52.074-.792.372-.272.297-1.04
+        1.016-1.04 2.479 0 1.462 1.065 2.875 1.213
+        3.074.149.198 2.096 3.2 5.077 4.487.709.306
+        1.262.489 1.694.625.712.227 1.36.195 1.871.118
+        .571-.085 1.758-.719 2.006-1.413.248-.694.248
+        -1.289.173-1.413-.074-.124-.272-.198-.57
+        -.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031
+        -1.378l-.361-.214-3.741.982.998-3.648-.235
+        -.374a9.86 9.86 0 01-1.51-5.26c.001-5.45
+        4.436-9.884 9.888-9.884 2.64 0 5.122 1.03
+        6.988 2.898a9.825 9.825 0 012.893 6.994c
+        -.003 5.45-4.437 9.884-9.885 9.884m8.413
+        -18.297A11.815 11.815 0 0012.05 0C5.495 0
+        .16 5.335.157 11.892c0 2.096.547 4.142
+        1.588 5.945L.057 24l6.305-1.654a11.882
+        11.882 0 005.683 1.448h.005c6.554 0
+        11.89-5.335 11.893-11.893a11.821
+        11.821 0 00-3.48-8.413z"/>
     </symbol>
     <symbol id="twitter-icon" viewBox="0 0 24 24">
       <path d="M18.244 2.25h3.308l-7.227 8.26
-      8.502 11.24H16.17l-5.214-6.817L4.99
-      21.75H1.68l7.73-8.835L1.254 2.25H8.08
-      l4.713 6.231zm-1.161 17.52h1.833L7.084
-      4.126H5.117z"/>
+        8.502 11.24H16.17l-5.214-6.817L4.99
+        21.75H1.68l7.73-8.835L1.254 2.25H8.08
+        l4.713 6.231zm-1.161 17.52h1.833L7.084
+        4.126H5.117z"/>
     </symbol>
     <symbol id="facebook-icon" viewBox="0 0 24 24">
       <path d="M22.675 0H1.325C.593 0 0 .593 0
-      1.325v21.351C0 23.407.593 24 1.325 24H12.82
-      v-9.294H9.692v-3.622h3.128V8.413c0-3.1
-      1.893-4.788 4.659-4.788 1.325 0 2.463.099
-      2.795.143v3.24l-1.918.001c-1.504 0-1.795
-      .715-1.795 1.763v2.313h3.587l-.467
-      3.622h-3.12V24h6.116c.73 0 1.323-.593
-      1.323-1.325V1.325C24 .593 23.407 0
-      22.675 0z"/>
+        1.325v21.351C0 23.407.593 24 1.325 24H12.82
+        v-9.294H9.692v-3.622h3.128V8.413c0-3.1
+        1.893-4.788 4.659-4.788 1.325 0 2.463.099
+        2.795.143v3.24l-1.918.001c-1.504 0-1.795
+        .715-1.795 1.763v2.313h3.587l-.467
+        3.622h-3.12V24h6.116c.73 0 1.323-.593
+        1.323-1.325V1.325C24 .593 23.407 0
+        22.675 0z"/>
     </symbol>
     <symbol id="email-icon" viewBox="0 0 24 24">
       <path d="M20 4H4c-1.1 0-1.99.9-1.99
-      2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9
-      2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6
-      l8 5 8-5v2z"/>
+        2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9
+        2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6
+        l8 5 8-5v2z"/>
     </symbol>
     <symbol id="link-icon" viewBox="0 0 24 24">
       <path d="M3.9 12c0-1.71 1.39-3.1
-      3.1-3.1h4V7H7c-2.76 0-5 2.24-5
-      5s2.24 5 5 5h4v-1.9H7c-1.71 0
-      -3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9
-      -6h-4v1.9h4c1.71 0 3.1 1.39 3.1
-      3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76
-      0 5-2.24 5-5s-2.24-5-5-5z"/>
+        3.1-3.1h4V7H7c-2.76 0-5 2.24-5
+        5s2.24 5 5 5h4v-1.9H7c-1.71 0
+        -3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9
+        -6h-4v1.9h4c1.71 0 3.1 1.39 3.1
+        3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76
+        0 5-2.24 5-5s-2.24-5-5-5z"/>
     </symbol>
   </svg>
 </head>
@@ -270,13 +275,18 @@
   <div class="player">
     <div class="track-header">
       <div class="track-title-container">
-        <div class="track-title" id="track-title">Selecione um Capítulo</div>
-        <div class="album-title" id="album-title">Humildade a Beleza da Santidade</div>
+        <div class="track-title" id="track-title">
+          Selecione um Capítulo
+        </div>
+        <div class="album-title" id="album-title">
+          Humildade a Beleza da Santidade
+        </div>
         <button class="menu-btn" id="menu-btn">⋮</button>
       </div>
       <div class="menu" id="menu">
         <div class="menu-item" id="timer-btn">
-          <span class="material-icons">brightness_3</span> Temporizador
+          <span class="material-icons">brightness_3</span>
+          Temporizador
         </div>
         <div class="submenu" id="timer-submenu">
           <div class="submenu-item" data-time="300">5 minutos</div>
@@ -285,14 +295,17 @@
           <div class="submenu-item" data-time="1800">30 minutos</div>
           <div class="submenu-item" data-time="3600">1 hora</div>
           <div class="submenu-item" data-time="0">
-            <span class="material-icons">cancel</span> Desativar
+            <span class="material-icons">cancel</span>
+            Desativar
           </div>
         </div>
         <div class="menu-item" id="download-audio">
-          <span class="material-icons">file_download</span> Baixar Capítulo
+          <span class="material-icons">file_download</span>
+          Baixar Capítulo
         </div>
         <div class="menu-item" id="share-btn">
-          <span class="material-icons">share</span> Compartilhar
+          <span class="material-icons">share</span>
+          Compartilhar
         </div>
       </div>
     </div>
@@ -303,7 +316,9 @@
       </button>
       <button id="play-btn" class="control-btn" title="Play/Pause">
         <span class="material-icons" id="play-icon">play_arrow</span>
-        <span class="material-icons" id="pause-icon" style="display:none">pause</span>
+        <span class="material-icons" id="pause-icon" style="display:none">
+          pause
+        </span>
       </button>
       <button id="next-btn" class="control-btn" title="Próxima">
         <span class="material-icons">skip_next</span>
@@ -329,46 +344,74 @@
       <span id="total-time">00:00</span>
     </div>
 
-    <audio id="audio-player" preload="metadata"></audio>
+    <audio id="audio-player"
+           preload="metadata"
+           crossorigin="anonymous"></audio>
 
     <div class="playlist" id="playlist">
-      <div class="playlist-item" data-src="https://archive.org/download/6_20250430_20250430/1.MP3" data-title="1. Humildade: A glória da criatura">
+      <div class="playlist-item"
+           data-src="https://archive.org/download/6_20250430_20250430/1.MP3"
+           data-title="1. Humildade: A glória da criatura">
         1 - Humildade: A glória da criatura
       </div>
-      <div class="playlist-item" data-src="https://archive.org/download/6_20250430_20250430/2.MP3" data-title="2. Humildade: O segredo da redenção">
+      <div class="playlist-item"
+           data-src="https://archive.org/download/6_20250430_20250430/2.MP3"
+           data-title="2. Humildade: O segredo da redenção">
         2 - Humildade: O segredo da redenção
       </div>
-      <div class="playlist-item" data-src="https://archive.org/download/6_20250430_20250430/3.MP3" data-title="3. A Humildade de Jesus">
+      <div class="playlist-item"
+           data-src="https://archive.org/download/6_20250430_20250430/3.MP3"
+           data-title="3. A Humildade de Jesus">
         3 - A Humildade de Jesus
       </div>
-      <div class="playlist-item" data-src="https://archive.org/download/6_20250430_20250430/4.MP3" data-title="4. Humildade no ensinamento de Jesus">
+      <div class="playlist-item"
+           data-src="https://archive.org/download/6_20250430_20250430/4.MP3"
+           data-title="4. Humildade no ensinamento de Jesus">
         4 - Humildade no ensinamento de Jesus
       </div>
-      <div class="playlist-item" data-src="https://archive.org/download/6_20250430_20250430/5.MP3" data-title="5. Humildade nos discípulos de Jesus">
+      <div class="playlist-item"
+           data-src="https://archive.org/download/6_20250430_20250430/5.MP3"
+           data-title="5. Humildade nos discípulos de Jesus">
         5 - Humildade nos discípulos de Jesus
       </div>
-      <div class="playlist-item" data-src="https://archive.org/download/6_20250430_20250430/6.MP3" data-title="6. Humildade na vida cotidiana">
+      <div class="playlist-item"
+           data-src="https://archive.org/download/6_20250430_20250430/6.MP3"
+           data-title="6. Humildade na vida cotidiana">
         6 - Humildade na vida cotidiana
       </div>
-      <div class="playlist-item" data-src="https://archive.org/download/6_20250430_20250430/7.MP3" data-title="7. Humildade e santidade">
+      <div class="playlist-item"
+           data-src="https://archive.org/download/6_20250430_20250430/7.MP3"
+           data-title="7. Humildade e santidade">
         7 - Humildade e santidade
       </div>
-      <div class="playlist-item" data-src="https://archive.org/download/6_20250430_20250430/8.MP3" data-title="8. Humildade e pecado">
+      <div class="playlist-item"
+           data-src="https://archive.org/download/6_20250430_20250430/8.MP3"
+           data-title="8. Humildade e pecado">
         8 - Humildade e pecado
       </div>
-      <div class="playlist-item" data-src="https://archive.org/download/6_20250430_20250430/9.MP3" data-title="9. Humildade e fé">
+      <div class="playlist-item"
+           data-src="https://archive.org/download/6_20250430_20250430/9.MP3"
+           data-title="9. Humildade e fé">
         9 - Humildade e fé
       </div>
-      <div class="playlist-item" data-src="https://archive.org/download/6_20250430_20250430/10.MP3" data-title="10. Humildade e a morte de si próprio">
+      <div class="playlist-item"
+           data-src="https://archive.org/download/6_20250430_20250430/10.MP3"
+           data-title="10. Humildade e a morte de si próprio">
         10 - Humildade e a morte de si próprio
       </div>
-      <div class="playlist-item" data-src="https://archive.org/download/6_20250430_20250430/11.MP3" data-title="11. Humildade e felicidade">
+      <div class="playlist-item"
+           data-src="https://archive.org/download/6_20250430_20250430/11.MP3"
+           data-title="11. Humildade e felicidade">
         11 - Humildade e felicidade
       </div>
-      <div class="playlist-item" data-src="https://archive.org/download/6_20250430_20250430/12.MP3" data-title="12. Humildade e exaltação">
+      <div class="playlist-item"
+           data-src="https://archive.org/download/6_20250430_20250430/12.MP3"
+           data-title="12. Humildade e exaltação">
         12 - Humildade e exaltação
       </div>
-      <div class="playlist-item" data-src="https://archive.org/download/6_20250430_20250430/13.MP3" data-title="13. Uma oração por humildade">
+      <div class="playlist-item"
+           data-src="https://archive.org/download/6_20250430_20250430/13.MP3"
+           data-title="13. Uma oração por humildade">
         13 - Uma oração por humildade
       </div>
     </div>
@@ -381,45 +424,45 @@
     <div class="share-options" id="share-options"></div>
     <input type="text" class="share-link" id="share-link" readonly>
     <button class="menu-item" id="copy-link">
-      <span class="material-icons">content_copy</span> Copiar Link
+      <span class="material-icons">content_copy</span>
+      Copiar Link
     </button>
   </div>
 
   <script>
-    // Elementos
-    const audioPlayer = document.getElementById('audio-player'),
-          playBtn = document.getElementById('play-btn'),
-          prevBtn = document.getElementById('prev-btn'),
-          nextBtn = document.getElementById('next-btn'),
-          playIcon = document.getElementById('play-icon'),
-          pauseIcon = document.getElementById('pause-icon'),
-          trackTitle = document.getElementById('track-title'),
-          albumTitle = document.getElementById('album-title'),
-          progressBar = document.getElementById('progress-bar'),
-          progress = document.getElementById('progress'),
-          currentTimeDisplay = document.getElementById('current-time'),
-          totalTimeDisplay = document.getElementById('total-time'),
-          speedSelect = document.getElementById('speed-select'),
-          tracks = Array.from(document.querySelectorAll('.playlist-item')),
-          menuBtn = document.getElementById('menu-btn'),
-          menu = document.getElementById('menu'),
-          timerBtn = document.getElementById('timer-btn'),
-          timerSubmenu = document.getElementById('timer-submenu'),
-          downloadAudioBtn = document.getElementById('download-audio'),
-          shareBtn = document.getElementById('share-btn'),
-          shareDialog = document.getElementById('share-dialog'),
-          shareOverlay = document.getElementById('share-overlay'),
-          closeShare = document.getElementById('close-share'),
-          shareLink = document.getElementById('share-link'),
-          copyLinkBtn = document.getElementById('copy-link'),
-          shareOptions = document.getElementById('share-options'),
-          coverImage = document.getElementById('cover-image');
+    const audioPlayer   = document.getElementById('audio-player'),
+          playBtn       = document.getElementById('play-btn'),
+          prevBtn       = document.getElementById('prev-btn'),
+          nextBtn       = document.getElementById('next-btn'),
+          playIcon      = document.getElementById('play-icon'),
+          pauseIcon     = document.getElementById('pause-icon'),
+          progressBar   = document.getElementById('progress-bar'),
+          progress      = document.getElementById('progress'),
+          currentTimeEl = document.getElementById('current-time'),
+          totalTimeEl   = document.getElementById('total-time'),
+          speedSelect   = document.getElementById('speed-select'),
+          tracks        = Array.from(document.querySelectorAll('.playlist-item')),
+          menuBtn       = document.getElementById('menu-btn'),
+          menu          = document.getElementById('menu'),
+          timerBtn      = document.getElementById('timer-btn'),
+          timerSubmenu  = document.getElementById('timer-submenu'),
+          downloadBtn   = document.getElementById('download-audio'),
+          shareBtn      = document.getElementById('share-btn'),
+          shareDialog   = document.getElementById('share-dialog'),
+          shareOverlay  = document.getElementById('share-overlay'),
+          closeShare    = document.getElementById('close-share'),
+          shareLink     = document.getElementById('share-link'),
+          copyLinkBtn   = document.getElementById('copy-link'),
+          shareOptions  = document.getElementById('share-options'),
+          coverImage    = document.getElementById('cover-image');
 
-    let currentIndex = 0, isPlaying = false, timerId = null;
+    let currentIndex = 0,
+        isPlaying    = false,
+        timerId      = null;
 
     function formatTime(sec) {
-      const m = Math.floor(sec / 60),
-            s = Math.floor(sec % 60);
+      const m = Math.floor(sec/60),
+            s = Math.floor(sec%60);
       return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
     }
 
@@ -427,53 +470,55 @@
       const title = tracks[currentIndex].dataset.title;
       document.title = `${title} – Humildade a Beleza da Santidade`;
       audioPlayer.playbackRate = parseFloat(speedSelect.value);
+      document.getElementById('track-title').textContent = title;
+
       if ('mediaSession' in navigator) {
         navigator.mediaSession.metadata = new MediaMetadata({
           title,
           artist: 'Humildade a Beleza da Santidade',
-          artwork: [{ src: coverImage.src, sizes: '300x300', type: 'image/jpeg' }]
+          artwork: [{ src: coverImage.src, sizes:'300x300', type:'image/jpeg' }]
         });
         navigator.mediaSession.playbackState = isPlaying ? 'playing' : 'paused';
         navigator.mediaSession.setActionHandler('play', playPause);
         navigator.mediaSession.setActionHandler('pause', playPause);
-        navigator.mediaSession.setActionHandler('previoustrack', () => prevBtn.click());
-        navigator.mediaSession.setActionHandler('nexttrack', () => nextBtn.click());
+        navigator.mediaSession.setActionHandler('previoustrack', prevTrack);
+        navigator.mediaSession.setActionHandler('nexttrack', nextTrack);
       }
     }
 
     function loadTrack(i) {
       tracks.forEach(t => t.classList.remove('active'));
       tracks[i].classList.add('active');
-      audioPlayer.src = tracks[i].dataset.src;
-      trackTitle.textContent = tracks[i].dataset.title;
       currentIndex = i;
+      audioPlayer.src = tracks[i].dataset.src;
+      audioPlayer.load();  // força recarregar metadados
       updateMetadata();
-      if (timerId) {
-        clearTimeout(timerId);
-        timerId = null;
-        alert("Temporizador cancelado porque você mudou de faixa manualmente");
-      }
-    }
-
-    function startTimer(seconds) {
-      clearTimeout(timerId);
-      timerId = setTimeout(() => {
-        audioPlayer.pause();
-        alert("Temporizador concluído - reprodução pausada");
-        timerId = null;
-      }, seconds * 1000);
+      if (timerId) { clearTimeout(timerId); timerId = null; }
     }
 
     function playPause() {
       if (!audioPlayer.src) loadTrack(0);
       audioPlayer.paused ? audioPlayer.play() : audioPlayer.pause();
     }
+    function prevTrack() {
+      loadTrack((currentIndex-1+tracks.length)%tracks.length);
+      audioPlayer.play();
+    }
+    function nextTrack() {
+      loadTrack((currentIndex+1)%tracks.length);
+      audioPlayer.play();
+    }
 
-    // Controles principais
-    playBtn.addEventListener('click', playPause);
-    prevBtn.addEventListener('click', () => { loadTrack((currentIndex-1+tracks.length)%tracks.length); audioPlayer.play(); });
-    nextBtn.addEventListener('click', () => { loadTrack((currentIndex+1)%tracks.length); audioPlayer.play(); });
-
+    // Eventos do áudio
+    audioPlayer.addEventListener('loadedmetadata', () => {
+      totalTimeEl.textContent = formatTime(audioPlayer.duration);
+    });
+    audioPlayer.addEventListener('timeupdate', () => {
+      if (!audioPlayer.duration) return;
+      progress.style.width = 
+        `${(audioPlayer.currentTime/audioPlayer.duration)*100}%`;
+      currentTimeEl.textContent = formatTime(audioPlayer.currentTime);
+    });
     audioPlayer.addEventListener('play', () => {
       isPlaying = true;
       playIcon.style.display = 'none';
@@ -486,125 +531,146 @@
       pauseIcon.style.display = 'none';
       updateMetadata();
     });
-    audioPlayer.addEventListener('loadedmetadata', () => {
-      totalTimeDisplay.textContent = formatTime(audioPlayer.duration);
-    });
-    audioPlayer.addEventListener('timeupdate', () => {
-      if (!audioPlayer.duration) return;
-      progress.style.width = `${(audioPlayer.currentTime / audioPlayer.duration) * 100}%`;
-      currentTimeDisplay.textContent = formatTime(audioPlayer.currentTime);
-    });
-    audioPlayer.addEventListener('ended', () => {
-      loadTrack((currentIndex+1)%tracks.length);
-      audioPlayer.play();
-    });
+    audioPlayer.addEventListener('ended', nextTrack);
+
+    // Controles
+    playBtn.addEventListener('click', playPause);
+    prevBtn.addEventListener('click', prevTrack);
+    nextBtn.addEventListener('click', nextTrack);
 
     progressBar.addEventListener('click', e => {
       const rect = progressBar.getBoundingClientRect();
-      audioPlayer.currentTime = ((e.clientX - rect.left) / rect.width) * audioPlayer.duration;
+      audioPlayer.currentTime =
+        ((e.clientX - rect.left)/rect.width)*audioPlayer.duration;
     });
     speedSelect.addEventListener('change', updateMetadata);
 
-    tracks.forEach((item, idx) => {
-      item.addEventListener('click', () => { loadTrack(idx); audioPlayer.play(); });
-    });
+    tracks.forEach((el, idx) =>
+      el.addEventListener('click', () => {
+        loadTrack(idx);
+        playPause();
+      })
+    );
 
-    // Menu e temporizador
-    menuBtn.addEventListener('click', e => {
-      e.stopPropagation();
-      menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
-    });
-    document.addEventListener('click', () => {
-      menu.style.display = 'none';
-      timerSubmenu.style.display = 'none';
-    });
+    // Temporizador
     timerBtn.addEventListener('click', e => {
       e.stopPropagation();
-      timerSubmenu.style.display = timerSubmenu.style.display === 'block' ? 'none' : 'block';
+      timerSubmenu.style.display =
+        timerSubmenu.style.display === 'block' ? 'none' : 'block';
     });
     document.querySelectorAll('#timer-submenu .submenu-item').forEach(item => {
       item.addEventListener('click', e => {
         e.stopPropagation();
-        const seconds = parseInt(item.dataset.time, 10);
-        const timeText = item.textContent.trim();
-        if (seconds > 0) {
-          startTimer(seconds);
-          alert(`Temporizador definido para ${timeText}`);
-        } else if (timerId) {
+        const secs = parseInt(item.dataset.time, 10),
+              label = item.textContent.trim();
+        if (secs > 0) {
+          clearTimeout(timerId);
+          timerId = setTimeout(() => {
+            audioPlayer.pause();
+            alert('Temporizador concluído – reprodução pausada');
+            timerId = null;
+          }, secs*1000);
+          alert(`Temporizador definido para ${label}`);
+        } else {
           clearTimeout(timerId);
           timerId = null;
-          alert("Temporizador desativado");
+          alert('Temporizador desativado');
         }
         menu.style.display = 'none';
         timerSubmenu.style.display = 'none';
       });
     });
 
+    // Menu geral
+    menuBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      menu.style.display =
+        menu.style.display === 'block' ? 'none' : 'block';
+    });
+    document.addEventListener('click', () => {
+      menu.style.display = 'none';
+      timerSubmenu.style.display = 'none';
+    });
+
     // Download
-    downloadAudioBtn.addEventListener('click', e => {
+    downloadBtn.addEventListener('click', e => {
       e.stopPropagation();
       if (!audioPlayer.src) return;
       const track = tracks[currentIndex];
-      const link = document.createElement('a');
-      link.href = track.dataset.src;
-      link.download = `${track.dataset.title}.mp3`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      const a = document.createElement('a');
+      a.href = track.dataset.src;
+      a.download = `${track.dataset.title}.mp3`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
       menu.style.display = 'none';
     });
 
     // Compartilhar
     function showShareDialog() {
-      const currentTrack = tracks[currentIndex];
-      shareLink.value = currentTrack.dataset.src;
+      const track = tracks[currentIndex];
+      shareLink.value = track.dataset.src;
       shareOverlay.style.display = 'block';
       shareDialog.style.display = 'block';
       shareOptions.innerHTML = '';
 
       if (navigator.share) {
-        const nativeShare = document.createElement('div');
-        nativeShare.className = 'share-option';
-        nativeShare.innerHTML = `
+        const ns = document.createElement('div');
+        ns.className = 'share-option';
+        ns.innerHTML = `
           <div class="share-icon link-icon"><svg><use href="#link-icon"/></svg></div>
           <span>Compartilhar</span>
         `;
-        nativeShare.addEventListener('click', async () => {
+        ns.addEventListener('click', async () => {
           try {
             await navigator.share({
-              title: currentTrack.dataset.title,
-              text: 'Ouça este capítulo: ' + currentTrack.dataset.title,
-              url: currentTrack.dataset.src,
+              title: track.dataset.title,
+              text: 'Ouça este capítulo: ' + track.dataset.title,
+              url: track.dataset.src
             });
             closeShareDialog();
           } catch {}
         });
-        shareOptions.appendChild(nativeShare);
+        shareOptions.appendChild(ns);
       }
 
-      const redes = [
-        { name:'WhatsApp', icon:'whatsapp-icon', url:`https://wa.me/?text=${encodeURIComponent(currentTrack.dataset.title + ' - ' + currentTrack.dataset.src)}` },
-        { name:'Facebook', icon:'facebook-icon', url:`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentTrack.dataset.src)}` },
-        { name:'X (Twitter)', icon:'twitter-icon', url:`https://twitter.com/intent/tweet?text=${encodeURIComponent(currentTrack.dataset.title)}&url=${encodeURIComponent(currentTrack.dataset.src)}` },
-        { name:'Email', icon:'email-icon', url:`mailto:?subject=${encodeURIComponent(currentTrack.dataset.title)}&body=${encodeURIComponent(currentTrack.dataset.src)}` }
+      const socials = [
+        {
+          name:'WhatsApp', icon:'whatsapp-icon',
+          url:`https://wa.me/?text=${encodeURIComponent(track.dataset.title + ' - ' + track.dataset.src)}`
+        },
+        {
+          name:'Facebook', icon:'facebook-icon',
+          url:`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(track.dataset.src)}`
+        },
+        {
+          name:'X (Twitter)', icon:'twitter-icon',
+          url:`https://twitter.com/intent/tweet?text=${encodeURIComponent(track.dataset.title)}&url=${encodeURIComponent(track.dataset.src)}`
+        },
+        {
+          name:'Email', icon:'email-icon',
+          url:`mailto:?subject=${encodeURIComponent(track.dataset.title)}&body=${encodeURIComponent(track.dataset.src)}`
+        }
       ];
-      redes.forEach(r => {
-        const opt = document.createElement('a');
-        opt.className = 'share-option';
-        opt.href = r.url;
-        opt.target = '_blank';
-        opt.rel = 'noopener noreferrer';
-        opt.innerHTML = `
-          <div class="share-icon ${r.icon}"><svg><use href="#${r.icon}"/></svg></div>
-          <span>${r.name}</span>
+      socials.forEach(s => {
+        const o = document.createElement('a');
+        o.className = 'share-option';
+        o.href = s.url;
+        o.target = '_blank';
+        o.rel = 'noopener noreferrer';
+        o.innerHTML = `
+          <div class="share-icon ${s.icon}"><svg><use href="#${s.icon}"/></svg></div>
+          <span>${s.name}</span>
         `;
-        shareOptions.appendChild(opt);
+        shareOptions.appendChild(o);
       });
     }
+
     function closeShareDialog() {
       shareOverlay.style.display = 'none';
       shareDialog.style.display = 'none';
     }
+
     shareBtn.addEventListener('click', e => {
       e.stopPropagation();
       if (audioPlayer.src) showShareDialog();
