@@ -1,5 +1,3 @@
-// service-worker.js
-
 const CACHE_NAME = 'audio-player-v2';
 const ASSETS = [
   '/',
