@@ -178,7 +178,7 @@
     .share-icon svg { width: 24px; height: 24px; fill: white; }
     .whatsapp-icon { background-color: #25D366; }
     .facebook-icon { background-color: #1877F2; }
-    .twitter-icon { background-color: #000; }
+    .twitter-icon { background-color: #000; } /* Note: Twitter is now X, icon might need update if a specific X icon is desired */
     .email-icon { background-color: #EA4335; }
     .link-icon { background-color: #5f6368; }
     .share-link {
@@ -191,6 +191,50 @@
       background: none; border: none; color: #aaa;
       font-size: 20px; cursor: pointer;
     }
+    /* Overlay e dialog de report */
+    .overlay#report-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 999;
+    }
+    .report-dialog {
+      display: none;
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      background: #222;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+      z-index: 1000;
+      width: 90%; max-width: 400px;
+    }
+    .report-form label {
+      display: flex; flex-direction: column;
+      color: #fff; margin-bottom: 10px;
+    }
+    .report-form input,
+    .report-form textarea {
+      padding: 8px; border: 1px solid #444;
+      border-radius: 4px; background: #111;
+      color: #fff; margin-top: 4px; resize: none; /* Added resize: none as it's common for textareas in dialogs */
+    }
+    .report-form button {
+      display: flex; align-items: center;
+      justify-content: center; gap: 8px;
+      padding: 10px; background: #25D366; /* Using a green similar to WhatsApp for send action */
+      color: #fff; border: none; border-radius: 4px;
+      cursor: pointer;
+    }
+    /* Adicionando estilo para o botão de fechar do report dialog, similar ao .close-share */
+    .close-report { /* Este seletor estava faltando, mas é referenciado no HTML */
+      position: absolute; top: 10px; right: 10px;
+      background: none; border: none; color: #aaa;
+      font-size: 20px; cursor: pointer;
+    }
+
 
     @media (max-width: 400px) {
       .control-btn { width: 50px; height: 50px; }
@@ -199,7 +243,6 @@
     }
   </style>
 
-  <!-- Ícones SVG para compartilhamento -->
   <svg style="display: none;">
     <symbol id="whatsapp-icon" viewBox="0 0 24 24">
       <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967
@@ -229,8 +272,7 @@
         11.89-5.335 11.893-11.893a11.821
         11.821 0 00-3.48-8.413z"/>
     </symbol>
-    <symbol id="twitter-icon" viewBox="0 0 24 24">
-      <path d="M18.244 2.25h3.308l-7.227 8.26
+    <symbol id="twitter-icon" viewBox="0 0 24 24"> <path d="M18.244 2.25h3.308l-7.227 8.26
         8.502 11.24H16.17l-5.214-6.817L4.99
         21.75H1.68l7.73-8.835L1.254 2.25H8.08
         l4.713 6.231zm-1.161 17.52h1.833L7.084
@@ -307,6 +349,10 @@
           <span class="material-icons">share</span>
           Compartilhar
         </div>
+        <div class="menu-item" id="report-btn">
+          <span class="material-icons">report_problem</span>
+          Reportar Problema
+        </div>
       </div>
     </div>
 
@@ -349,7 +395,7 @@
            crossorigin="anonymous"></audio>
 
     <div class="playlist" id="playlist">
-      <div class="playlist-item"
+          <div class="playlist-item"
            data-src="https://archive.org/download/6_20250430_20250430/1.MP3"
            data-title="1. Humildade: A glória da criatura">
         1 - Humildade: A glória da criatura
@@ -415,9 +461,7 @@
         13 - Uma oração por humildade
       </div>
     </div>
-  </div>
-
-  <div class="overlay" id="share-overlay"></div>
+    </div> <div class="overlay" id="share-overlay"></div>
   <div class="share-dialog" id="share-dialog">
     <button class="close-share" id="close-share">&times;</button>
     <h3>Compartilhar Capítulo</h3>
@@ -427,6 +471,31 @@
       <span class="material-icons">content_copy</span>
       Copiar Link
     </button>
+  </div> <div class="overlay" id="report-overlay"></div>
+  <div class="report-dialog" id="report-dialog">
+    <button class="close-report" id="close-report">&times;</button>
+    <h3>Reportar Problema</h3>
+    <form id="report-form" class="report-form">
+      <label>Referência:
+        <input type="text" id="report-ref" value="Arauto" readonly>
+      </label>
+      <label>Livro:
+        <input type="text" id="report-book" value="Humildade a Beleza da Santidade" readonly>
+      </label>
+      <label>Nome:
+        <input type="text" id="report-name" required>
+      </label>
+      <label>Email:
+        <input type="email" id="report-email" required>
+      </label>
+      <label>Telefone:
+        <input type="tel" id="report-phone">
+      </label>
+      <label>Mensagem:
+        <textarea id="report-message" rows="4" required></textarea>
+      </label>
+      <button type="submit"><span class="material-icons">send</span> Enviar</button>
+    </form>
   </div>
 
   <script>
@@ -468,7 +537,7 @@
 
     function updateMetadata() {
       const title = tracks[currentIndex].dataset.title;
-      document.title = `${title} – Humildade a Beleza da Santidade`;
+      document.title = `${title} –  Humildade a Beleza da Santidade`;
       audioPlayer.playbackRate = parseFloat(speedSelect.value);
       document.getElementById('track-title').textContent = title;
 
@@ -674,21 +743,98 @@
     shareBtn.addEventListener('click', e => {
       e.stopPropagation();
       if (audioPlayer.src) showShareDialog();
+      menu.style.display = 'none'; // Fechar menu ao abrir compartilhar
     });
     closeShare.addEventListener('click', closeShareDialog);
     shareOverlay.addEventListener('click', closeShareDialog);
     copyLinkBtn.addEventListener('click', () => {
       shareLink.select();
-      document.execCommand('copy');
-      const orig = copyLinkBtn.innerHTML;
-      copyLinkBtn.innerHTML = '<span class="material-icons">check</span> Copiado!';
-      setTimeout(() => copyLinkBtn.innerHTML = orig, 2000);
+      try { // Usar try-catch para document.execCommand
+        document.execCommand('copy');
+        const orig = copyLinkBtn.innerHTML;
+        copyLinkBtn.innerHTML = '<span class="material-icons">check</span> Copiado!';
+        setTimeout(() => copyLinkBtn.innerHTML = orig, 2000);
+      } catch (err) {
+        console.error('Falha ao copiar o link:', err);
+        // Poderia adicionar um feedback visual para o usuário aqui, se desejado
+      }
     });
+
+    // === Reportar Problema ===
+    const reportBtn     = document.getElementById('report-btn'); // Botão adicionado ao menu
+    const reportOverlay = document.getElementById('report-overlay');
+    const reportDialog  = document.getElementById('report-dialog');
+    const closeReport   = document.getElementById('close-report');
+    const reportForm    = document.getElementById('report-form');
+
+    // Abre o modal de reportar problema
+    if (reportBtn) { // Adicionar verificação para garantir que o botão existe
+        reportBtn.addEventListener('click', e => {
+          e.stopPropagation();
+          reportOverlay.style.display = 'block';
+          reportDialog.style.display  = 'block';
+          menu.style.display          = 'none'; // Fechar menu principal
+        });
+    }
+
+    // Fecha o modal de reportar problema
+    if (closeReport) {
+        closeReport.addEventListener('click', () => {
+          reportOverlay.style.display = 'none';
+          reportDialog.style.display  = 'none';
+        });
+    }
+    if (reportOverlay) {
+        reportOverlay.addEventListener('click', () => {
+          reportOverlay.style.display = 'none';
+          reportDialog.style.display  = 'none';
+        });
+    }
+    // Envia por mailto:
+    if (reportForm) {
+       reportForm.addEventListener('submit', e => {
+  e.preventDefault();
+
+  // 1) Troque aqui pelo seu e-mail de destino:
+  const supportEmail = 'suportearauto@gmail.com';
+
+  const reference = document.getElementById('report-ref').value;
+  const book      = document.getElementById('report-book').value;
+  const name      = document.getElementById('report-name').value.trim();
+  const email     = document.getElementById('report-email').value.trim();
+  const phone     = document.getElementById('report-phone').value.trim();
+  const message   = document.getElementById('report-message').value.trim();
+
+  const subject = encodeURIComponent(
+    `Problema no player – ${reference} / ${book}`
+  );
+  const body = encodeURIComponent(
+    `Referência: ${reference}\n` +
+    `Livro: ${book}\n` +
+    `Nome: ${name}\n` +
+    `Email: ${email}\n` +
+    `Telefone: ${phone}\n\n` +
+    `${message}`
+  );
+
+  // 2) Gere o link mailto completo:
+  const mailtoLink = `mailto:${supportEmail}?subject=${subject}&body=${body}`;
+
+  // 3) Dispare o cliente de e-mail:
+  window.open(mailtoLink);
+
+  // 4) Feche o modal e limpe o formulário
+  reportOverlay.style.display = 'none';
+  reportDialog.style.display  = 'none';
+  reportForm.reset();
+        });
+    }
+
 
     // Registro do Service Worker
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker
-        .register('/service-worker.js', { scope: '/' })
+        .register('/service-worker.js', { scope: '/' }) // Ajuste o caminho se o seu SW estiver em outro local
         .then(() => console.log('Service Worker registrado com sucesso!'))
         .catch(err => console.error('Erro ao registrar SW:', err));
     }
