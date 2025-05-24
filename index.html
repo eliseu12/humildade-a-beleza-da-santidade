@@ -83,6 +83,9 @@
       display: none; padding-left: 15px;
       border-left: 1px solid #444; margin-top: 5px;
     }
+    .menu-item#indique-btn {
+  color: #25D366; /* Cor verde do WhatsApp */
+}
     .submenu-item {
       padding: 6px 8px; cursor: pointer;
       display: flex; align-items: center;
@@ -347,8 +350,12 @@
         </div>
         <div class="menu-item" id="share-btn">
           <span class="material-icons">share</span>
-          Compartilhar
+          Compartilhar Capítulo
         </div>
+        <div class="menu-item" id="indique-btn">
+  <span class="material-icons">thumb_up</span>
+  Indique o Arauto+
+</div>
         <div class="menu-item" id="report-btn">
           <span class="material-icons">report_problem</span>
           Reportar Problema
@@ -662,104 +669,168 @@
     });
 
     // Download
-    downloadBtn.addEventListener('click', e => {
-      e.stopPropagation();
-      if (!audioPlayer.src) return;
-      const track = tracks[currentIndex];
-      const a = document.createElement('a');
-      a.href = track.dataset.src;
-      a.download = `${track.dataset.title}.mp3`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      menu.style.display = 'none';
-    });
+downloadBtn.addEventListener('click', async (e) => {
+  e.stopPropagation();
+  menu.style.display = 'none'; // Fecha o menu imediatamente
+
+  if (!audioPlayer.src) {
+    alert('Nenhum capítulo selecionado para baixar.');
+    return;
+  }
+
+  const track = tracks[currentIndex];
+  const trackUrl = track.dataset.src;
+  const trackTitle = track.dataset.title;
+
+  try {
+    // Exibe um feedback para o usuário
+    downloadBtn.innerHTML = '<span class="material-icons">downloading</span> Baixando...';
+
+    // Busca o arquivo de áudio
+    const response = await fetch(trackUrl);
+    if (!response.ok) {
+      throw new Error(`Erro ao baixar o arquivo: ${response.statusText}`);
+    }
+    const blob = await response.blob();
+
+    // Cria um link temporário para o blob
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = url;
+    a.download = `${trackTitle}.mp3`; // Define o nome do arquivo
+
+    // Adiciona ao corpo, clica para iniciar o download e remove
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url); // Libera a memória
+    document.body.removeChild(a);
+
+  } catch (error) {
+    console.error('Erro no download:', error);
+    alert('Não foi possível baixar o áudio. Verifique sua conexão ou tente novamente.');
+  } finally {
+    // Restaura o texto original do botão
+    downloadBtn.innerHTML = '<span class="material-icons">file_download</span> Baixar Capítulo';
+  }
+});
 
     // Compartilhar
     function showShareDialog() {
-      const track = tracks[currentIndex];
-      shareLink.value = track.dataset.src;
-      shareOverlay.style.display = 'block';
-      shareDialog.style.display = 'block';
-      shareOptions.innerHTML = '';
+  const track = tracks[currentIndex];
+  const mensagemCompleta = `*Você nem sabe!* 💖
 
-      if (navigator.share) {
-        const ns = document.createElement('div');
-        ns.className = 'share-option';
-        ns.innerHTML = `
-          <div class="share-icon link-icon"><svg><use href="#link-icon"/></svg></div>
-          <span>Compartilhar</span>
-        `;
-        ns.addEventListener('click', async () => {
-          try {
-            await navigator.share({
-              title: track.dataset.title,
-              text: 'Ouça este capítulo: ' + track.dataset.title,
-              url: track.dataset.src
-            });
-            closeShareDialog();
-          } catch {}
+Estava ouvindo o capítulo "${track.dataset.title}" no *Aplicativo de AudioBooks-Arauto* e imediatamente pensei em você! ✨
+
+*Vou deixar o link aqui pra você ouvir também*:
+${track.dataset.src}
+
+_Depois me conta o que achou!_ 🤗
+
+
+(*P.S.: Tem muitas outras pérolas esperando por você em*: https://arauto.com/apparauto)`;
+
+  shareLink.value = mensagemCompleta;
+  shareOverlay.style.display = 'block';
+  shareDialog.style.display = 'block';
+  shareOptions.innerHTML = '';
+
+  if (navigator.share) {
+    const ns = document.createElement('div');
+    ns.className = 'share-option';
+    ns.innerHTML = `
+      <div class="share-icon link-icon"><svg><use href="#link-icon"/></svg></div>
+      <span>Compartilhar Capítulo</span>
+    `;
+    ns.addEventListener('click', async () => {
+      try {
+        await navigator.share({
+          title: `Ouça: ${track.dataset.title}`,
+          text: `Estou ouvindo este capítulo no Aplicativo Arauto e pensei em você! 💖`,
+          url: track.dataset.src
         });
-        shareOptions.appendChild(ns);
-      }
-
-      const socials = [
-        {
-          name:'WhatsApp', icon:'whatsapp-icon',
-          url:`https://wa.me/?text=${encodeURIComponent(track.dataset.title + ' - ' + track.dataset.src)}`
-        },
-        {
-          name:'Facebook', icon:'facebook-icon',
-          url:`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(track.dataset.src)}`
-        },
-        {
-          name:'X (Twitter)', icon:'twitter-icon',
-          url:`https://twitter.com/intent/tweet?text=${encodeURIComponent(track.dataset.title)}&url=${encodeURIComponent(track.dataset.src)}`
-        },
-        {
-          name:'Email', icon:'email-icon',
-          url:`mailto:?subject=${encodeURIComponent(track.dataset.title)}&body=${encodeURIComponent(track.dataset.src)}`
-        }
-      ];
-      socials.forEach(s => {
-        const o = document.createElement('a');
-        o.className = 'share-option';
-        o.href = s.url;
-        o.target = '_blank';
-        o.rel = 'noopener noreferrer';
-        o.innerHTML = `
-          <div class="share-icon ${s.icon}"><svg><use href="#${s.icon}"/></svg></div>
-          <span>${s.name}</span>
-        `;
-        shareOptions.appendChild(o);
-      });
-    }
-
-    function closeShareDialog() {
-      shareOverlay.style.display = 'none';
-      shareDialog.style.display = 'none';
-    }
-
-    shareBtn.addEventListener('click', e => {
-      e.stopPropagation();
-      if (audioPlayer.src) showShareDialog();
-      menu.style.display = 'none'; // Fechar menu ao abrir compartilhar
+        closeShareDialog();
+      } catch {}
     });
-    closeShare.addEventListener('click', closeShareDialog);
-    shareOverlay.addEventListener('click', closeShareDialog);
-    copyLinkBtn.addEventListener('click', () => {
-      shareLink.select();
-      try { // Usar try-catch para document.execCommand
-        document.execCommand('copy');
-        const orig = copyLinkBtn.innerHTML;
-        copyLinkBtn.innerHTML = '<span class="material-icons">check</span> Copiado!';
-        setTimeout(() => copyLinkBtn.innerHTML = orig, 2000);
-      } catch (err) {
-        console.error('Falha ao copiar o link:', err);
-        // Poderia adicionar um feedback visual para o usuário aqui, se desejado
-      }
-    });
+    shareOptions.appendChild(ns);
+  }
 
+  const socials = [
+    {
+      name:'WhatsApp', icon:'whatsapp-icon',
+      url:`https://wa.me/?text=${encodeURIComponent(mensagemCompleta)}`
+    },
+    {
+      name:'Facebook', icon:'facebook-icon',
+      url:`https://www.facebook.com/sharer/sharer.php?quote=${encodeURIComponent('Estou ouvindo no Arauto e pensei em você! ❤️ ' + track.dataset.title)}&u=${encodeURIComponent(track.dataset.src)}`
+    },
+    {
+      name:'X (Twitter)', icon:'twitter-icon',
+      url:`https://twitter.com/intent/tweet?text=${encodeURIComponent('Acabei de encontrar essa joia no @ArautoApp e pensei em você! ❤️ Ouça "' + track.dataset.title + '" aqui: ')}&url=${encodeURIComponent(track.dataset.src)}`
+    },
+    {
+      name:'Email', icon:'email-icon',
+      url:`mailto:?subject=${encodeURIComponent('Pensei em você! ❤️ ' + track.dataset.title)}&body=${encodeURIComponent(mensagemCompleta)}`
+    }
+  ];
+  
+  socials.forEach(s => {
+    const o = document.createElement('a');
+    o.className = 'share-option';
+    o.href = s.url;
+    o.target = '_blank';
+    o.rel = 'noopener noreferrer';
+    o.innerHTML = `
+      <div class="share-icon ${s.icon}"><svg><use href="#${s.icon}"/></svg></div>
+      <span>${s.name}</span>
+    `;
+    shareOptions.appendChild(o);
+  });
+}
+
+function closeShareDialog() {
+  shareOverlay.style.display = 'none';
+  shareDialog.style.display = 'none';
+}
+
+shareBtn.addEventListener('click', e => {
+  e.stopPropagation();
+  if (audioPlayer.src) showShareDialog();
+  menu.style.display = 'none';
+});
+
+closeShare.addEventListener('click', closeShareDialog);
+shareOverlay.addEventListener('click', closeShareDialog);
+
+copyLinkBtn.addEventListener('click', () => {
+  shareLink.select();
+  try {
+    document.execCommand('copy');
+    const orig = copyLinkBtn.innerHTML;
+    copyLinkBtn.innerHTML = '<span class="material-icons">check</span> Mensagem copiada!';
+    setTimeout(() => copyLinkBtn.innerHTML = orig, 2000);
+  } catch (err) {
+    console.error('Falha ao copiar:', err);
+  }
+});
+
+    // indicar o arauto
+const indiqueBtn = document.getElementById('indique-btn');
+indiqueBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  menu.style.display = 'none';
+  
+  const texto = `Seu amigo te indicou para conhecer o *Arauto Audiobook*! ${String.fromCodePoint(0x1F3A7)}
+  
+*TORNE-SE MEMBRO VITALÍCIO* e garanta sua edificação com os *melhores audiobooks Cristãos*!
+    
+${String.fromCodePoint(0x1F449)} Clique no link e descubra como! ${String.fromCodePoint(0x1F525)}
+
+https://arauto.com/membro-vitalicio`;
+
+  window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank');
+});
+    
     // === Reportar Problema ===
     const reportBtn     = document.getElementById('report-btn'); // Botão adicionado ao menu
     const reportOverlay = document.getElementById('report-overlay');
