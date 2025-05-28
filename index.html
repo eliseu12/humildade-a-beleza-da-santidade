@@ -11,7 +11,7 @@
         rel="stylesheet">
 
   <style>
-    html, body { /* Garantir que html e body ocupem altura total */
+    html, body {
       height: 100%;
       margin: 0;
       padding: 0;
@@ -22,11 +22,11 @@
       color: #fff;
       font-family: Arial, sans-serif;
       display: flex;
-      flex-direction: column; /* Padrão: vertical */
+      flex-direction: column; 
       align-items: center;
-      padding: 20px; /* Padding geral */
-      min-height: 100%; /* Garante que o body preencha a viewport */
-      overflow-x: hidden; /* Prevenir scroll horizontal desnecessário */
+      padding: 20px; 
+      min-height: 100%; 
+      overflow-x: hidden; 
     }
     .cover {
       width: 100%; 
@@ -35,7 +35,7 @@
     }
     .cover img {
       width: 100%; 
-      height: auto; /* Mantém proporção */
+      height: auto; 
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.5),
                   0 0 20px #fff, 0 0 40px #fff;
@@ -59,140 +59,40 @@
       position: relative;
       box-sizing: border-box;
     }
-    .track-header {
-      display: flex; flex-direction: column;
-      width: 100%; margin-bottom: 15px;
-      text-align: center;
-    }
-    .track-title-container {
-      position: relative;
-    }
-    .track-title {
-      font-size: 20px; font-weight: bold;
-      white-space: nowrap; overflow: hidden;
-      text-overflow: ellipsis; padding: 0 30px;
-    }
-    .album-title {
-      font-size: 14px; color: #aaa;
-      margin-top: 5px;
-    }
-    .menu-btn {
-      background: none; border: none; color: white;
-      font-size: 24px; cursor: pointer; padding: 5px;
-      position: absolute; right: 0; top: 0;
-    }
-    .menu {
-      position: absolute; background: #222;
-      border-radius: 8px; padding: 10px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-      z-index: 100; display: none;
-      right: 20px; top: 60px; max-width: 300px;
-    }
-    .menu-item {
-      padding: 8px 12px; cursor: pointer;
-      border-radius: 4px; display: flex;
-      align-items: center; gap: 8px;
-    }
+    /* Estilos do player e outros componentes ... (iguais aos do seu modelo original) */
+    .track-header { display: flex; flex-direction: column; width: 100%; margin-bottom: 15px; text-align: center; }
+    .track-title-container { position: relative; }
+    .track-title { font-size: 20px; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 30px; }
+    .album-title { font-size: 14px; color: #aaa; margin-top: 5px; }
+    .menu-btn { background: none; border: none; color: white; font-size: 24px; cursor: pointer; padding: 5px; position: absolute; right: 0; top: 0; }
+    .menu { position: absolute; background: #222; border-radius: 8px; padding: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); z-index: 100; display: none; right: 20px; top: 60px; max-width: 300px; }
+    .menu-item { padding: 8px 12px; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 8px; }
     .menu-item:hover { background: #444; }
-    .submenu {
-      display: none; padding-left: 15px;
-      border-left: 1px solid #444; margin-top: 5px;
-    }
-    .menu-item#indique-btn {
-      color: #25D366; 
-    }
-    .submenu-item {
-      padding: 6px 8px; cursor: pointer;
-      display: flex; align-items: center;
-    }
+    .submenu { display: none; padding-left: 15px; border-left: 1px solid #444; margin-top: 5px; }
+    .menu-item#indique-btn { color: #25D366; }
+    .submenu-item { padding: 6px 8px; cursor: pointer; display: flex; align-items: center; }
     .submenu-item:hover { background: #333; }
-    .controls {
-      display: flex; gap: 20px;
-      align-items: center; justify-content: center;
-      margin-bottom: 15px;
-    }
-    .control-btn {
-      background: none; border: none;
-      width: 60px; height: 60px; cursor: pointer;
-      display: flex; align-items: center;
-      justify-content: center; border-radius: 50%;
-      outline: none; transition: box-shadow .2s, transform .2s;
-    }
-    .control-btn:hover {
-      transform: scale(1.1);
-      box-shadow: 0 0 15px rgba(255,255,255,0.8);
-    }
-    .control-btn .material-icons {
-      font-size: 30px; color: #fff;
-    }
-    .progress-speed {
-      display: flex; align-items: center;
-      width: 100%; margin-top: 10px;
-    }
-    .progress-bar {
-      flex: 1; height: 6px; background: #333;
-      border-radius: 4px; cursor: pointer; overflow: hidden;
-    }
-    .progress {
-      height: 100%; background: #fff;
-      width: 0%; transition: width .2s linear;
-    }
+    .controls { display: flex; gap: 20px; align-items: center; justify-content: center; margin-bottom: 15px; }
+    .control-btn { background: none; border: none; width: 60px; height: 60px; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 50%; outline: none; transition: box-shadow .2s, transform .2s; }
+    .control-btn:hover { transform: scale(1.1); box-shadow: 0 0 15px rgba(255,255,255,0.8); }
+    .control-btn .material-icons { font-size: 30px; color: #fff; }
+    .progress-speed { display: flex; align-items: center; width: 100%; margin-top: 10px; }
+    .progress-bar { flex: 1; height: 6px; background: #333; border-radius: 4px; cursor: pointer; overflow: hidden; }
+    .progress { height: 100%; background: #fff; width: 0%; transition: width .2s linear; }
     .speed-control { margin-left: 10px; }
-    .speed-control select {
-      background: #111; border: 1px solid #444;
-      color: #fff; padding: 4px; border-radius: 4px;
-      cursor: pointer;
-    }
-    .time-info {
-      width: 100%; display: flex;
-      justify-content: space-between;
-      font-size: 12px; color: #aaa;
-      margin-top: 5px;
-    }
-    .playlist {
-      margin-top: 20px; width: 100%;
-      max-height: 200px; /* Altura padrão para retrato */
-      overflow-y: auto;
-    }
-    .playlist-item {
-      padding: 10px; border-bottom: 1px solid #444;
-      cursor: pointer; color: #ccc;
-    }
-    .playlist-item.active {
-      background: #222; color: #fff;
-    }
+    .speed-control select { background: #111; border: 1px solid #444; color: #fff; padding: 4px; border-radius: 4px; cursor: pointer; }
+    .time-info { width: 100%; display: flex; justify-content: space-between; font-size: 12px; color: #aaa; margin-top: 5px; }
+    .playlist { margin-top: 20px; width: 100%; max-height: 200px; overflow-y: auto; }
+    .playlist-item { padding: 10px; border-bottom: 1px solid #444; cursor: pointer; color: #ccc; }
+    .playlist-item.active { background: #222; color: #fff; }
     .playlist-item:hover { background: #333; }
-
-    /* Compartilhamento e Report (sem alterações diretas para paisagem, mas devem funcionar dentro do player) */
     .overlay, .share-dialog, .report-dialog { display: none; }
-    .overlay {
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.7); z-index: 999;
-    }
-    .share-dialog, .report-dialog {
-      position: fixed; top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      background: #222; padding: 20px;
-      border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-      z-index: 1000; width: 90%; max-width: 400px;
-    }
+    .overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 999; }
+    .share-dialog, .report-dialog { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #222; padding: 20px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); z-index: 1000; width: 90%; max-width: 400px; }
     .share-dialog h3, .report-dialog h3 { margin-top: 0; color: #fff; }
-    .share-options {
-      display: flex; flex-wrap: wrap; gap: 10px;
-      margin: 15px 0;
-    }
-    .share-option {
-      display: flex; flex-direction: column;
-      align-items: center; cursor: pointer;
-      color: #fff; text-decoration: none;
-      font-size: 12px; width: 60px;
-    }
-    .share-icon {
-      width: 40px; height: 40px; border-radius: 50%;
-      display: flex; align-items: center;
-      justify-content: center; margin-bottom: 5px;
-      transition: transform 0.2s;
-    }
+    .share-options { display: flex; flex-wrap: wrap; gap: 10px; margin: 15px 0; }
+    .share-option { display: flex; flex-direction: column; align-items: center; cursor: pointer; color: #fff; text-decoration: none; font-size: 12px; width: 60px; }
+    .share-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 5px; transition: transform 0.2s; }
     .share-icon:hover { transform: scale(1.1); }
     .share-icon svg { width: 24px; height: 24px; fill: white; }
     .whatsapp-icon { background-color: #25D366; }
@@ -200,97 +100,49 @@
     .twitter-icon { background-color: #000; }
     .email-icon { background-color: #EA4335; }
     .link-icon { background-color: #5f6368; }
-    .share-link {
-      width: 100%; padding: 8px; background: #333;
-      border: none; border-radius: 4px; color: #fff;
-      margin-top: 10px;
-    }
-    .close-share, .close-report {
-      position: absolute; top: 10px; right: 10px;
-      background: none; border: none; color: #aaa;
-      font-size: 20px; cursor: pointer;
-    }
-    .report-form label {
-      display: flex; flex-direction: column;
-      color: #fff; margin-bottom: 10px;
-    }
-    .report-form input,
-    .report-form textarea {
-      padding: 8px; border: 1px solid #444;
-      border-radius: 4px; background: #111;
-      color: #fff; margin-top: 4px; resize: none;
-    }
-    .report-form button {
-      display: flex; align-items: center;
-      justify-content: center; gap: 8px;
-      padding: 10px; background: #25D366;
-      color: #fff; border: none; border-radius: 4px;
-      cursor: pointer;
-    }
+    .share-link { width: 100%; padding: 8px; background: #333; border: none; border-radius: 4px; color: #fff; margin-top: 10px; }
+    .close-share, .close-report { position: absolute; top: 10px; right: 10px; background: none; border: none; color: #aaa; font-size: 20px; cursor: pointer; }
+    .report-form label { display: flex; flex-direction: column; color: #fff; margin-bottom: 10px; }
+    .report-form input, .report-form textarea { padding: 8px; border: 1px solid #444; border-radius: 4px; background: #111; color: #fff; margin-top: 4px; resize: none; }
+    .report-form button { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px; background: #25D366; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
     
-    /* Media Query para telas menores em modo retrato (já existente) */
-    @media (max-width: 400px) {
+    /* Estilo para a mensagem de rotação */
+    #rotate-device-message {
+      display: none; /* Oculto por padrão */
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 20px;
+      font-size: 18px;
+      width: 100%;
+      height: 100%; /* Para ocupar toda a tela no modo paisagem */
+    }
+    #rotate-device-message .material-icons {
+      font-size: 48px;
+      margin-bottom: 15px;
+    }
+
+    @media (max-width: 400px) { /* Para telas pequenas em modo retrato */
       .control-btn { width: 50px; height: 50px; }
       .control-btn .material-icons { font-size: 24px; }
       .track-title { font-size: 18px; }
     }
 
-    /* NOVOS ESTILOS PARA MODO PAISAGEM (LANDSCAPE) */
-    @media (orientation: landscape) and (max-width: 900px) and (max-height: 550px) { 
+    /* MODO PAISAGEM: Esconde player e capa, mostra mensagem */
+    @media (orientation: landscape) and (max-height: 600px) { 
       body {
-        flex-direction: row;     /* Capa e player lado a lado */
-        justify-content: space-evenly; /* Distribui espaço ou 'center' se preferir */
-        align-items: center;     /* Centraliza verticalmente */
-        padding: 10px;           /* Padding menor em paisagem */
-        height: 100vh;           /* Ocupa altura total da viewport */
-        overflow: hidden;        /* Previne scroll no body */
+        justify-content: center; /* Centraliza a mensagem */
+        align-items: center;
+        padding: 10px; /* Reduz padding do body */
+        overflow: hidden; /* Previne scroll no body */
       }
-
-      .cover {
-        flex: 0 1 auto;       /* Não cresce, pode encolher se necessário, base auto */
-        width: auto;          /* Largura automática baseada na altura */
-        max-width: 35vh;      /* Largura máxima como porcentagem da altura da viewport */
-        height: calc(100vh - 20px); /* Altura máxima menos padding do body */
-        max-height: calc(100vh - 20px); 
-        margin-right: 10px;   /* Espaço à direita da capa */
-        margin-bottom: 0;     /* Remove margem inferior */
+      .cover, .player {
+        display: none !important; /* Força o desaparecimento */
       }
-      .cover img {
-        width: auto;          /* Para manter proporção */
-        height: 100%;         /* Imagem preenche a altura do contêiner .cover */
-        object-fit: contain;  /* Garante que toda imagem seja visível e proporcional */
+      #rotate-device-message {
+        display: flex !important; /* Força o aparecimento */
       }
-
-      .player {
-        flex: 1 1 auto;       /* Player ocupa o espaço restante */
-        height: calc(100vh - 20px); /* Altura do player igual à da viewport menos padding */
-        max-height: calc(100vh - 20px);
-        max-width: 60%;       /* Para não ficar excessivamente largo */
-        overflow-y: auto;     /* Scroll vertical se o conteúdo do player for maior */
-        margin-top: 0;
-        padding: 15px;        /* Ajuste o padding interno do player */
-      }
-
-      .track-header { margin-bottom: 10px; }
-      .track-title { font-size: 16px; padding: 0 20px;} /* Título menor */
-      .album-title { font-size: 12px; margin-top: 3px;}
-      .menu-btn { font-size: 20px; padding: 3px;}
-      .menu {top: 45px; right: 10px;} /* Ajustar posição do menu */
-      
-      .controls { margin-bottom: 10px; gap: 15px;}
-      .control-btn { width: 45px; height: 45px; }
-      .control-btn .material-icons { font-size: 24px; }
-      
-      .progress-speed { margin-top: 8px; }
-      .time-info { font-size: 11px; margin-top: 4px;}
-      
-      .playlist {
-        /* Tenta calcular uma altura dinâmica para a playlist */
-        /* Subtrai uma estimativa da altura dos outros elementos do player */
-        max-height: calc(100% - 200px); /* Ajuste este valor de 200px conforme necessário */
-        font-size: 12px;
-      }
-      .playlist-item { padding: 7px 10px; }
     }
   </style>
 
@@ -358,14 +210,12 @@
   </svg>
 </head>
 <body>
-  <div class="cover">
-    <img id="cover-image"
+  <div class="cover"> <img id="cover-image"
          src="https://live.staticflickr.com/65535/54488171468_d37b7e80c9_n.jpg"
          alt="Capa do Álbum" />
   </div>
 
-  <div class="player">
-    <div class="track-header">
+  <div class="player"> <div class="track-header">
         <div class="track-title-container">
           <div class="track-title" id="track-title">
             Selecione um Capítulo
@@ -517,6 +367,11 @@
       </div>
   </div>
   
+  <div id="rotate-device-message">
+    <span class="material-icons">screen_rotation</span>
+    Por favor, utilize o dispositivo no modo vertical para uma melhor experiência.
+  </div>
+
   <div class="overlay" id="share-overlay"></div>
   <div class="share-dialog" id="share-dialog">
     <button class="close-share" id="close-share">&times;</button>
@@ -558,7 +413,6 @@
 
   <script>
     // JavaScript do seu modelo original "Humildade a Beleza da Santidade" permanece aqui
-    // (incluindo iniciarPlayer, localStorage, etc.)
     const audioPlayer   = document.getElementById('audio-player'),
           playBtn       = document.getElementById('play-btn'),
           prevBtn       = document.getElementById('prev-btn'),
@@ -780,7 +634,7 @@
       buyBookBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         menu.style.display = 'none';
-        const bookUrl = 'https://amzn.to/4kdu3B4'; 
+        const bookUrl = 'https://amzn.to/4kdu3B4'; // Link do modelo original
         window.open(bookUrl, '_blank');
       });
     }
@@ -988,6 +842,7 @@ _Depois me conta o que achou!_ 🤗
     
     iniciarPlayer();
 
+    // Registro do Service Worker (mantido ativo como no modelo)
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker
         .register('/service-worker.js', { scope: '/' }) 
