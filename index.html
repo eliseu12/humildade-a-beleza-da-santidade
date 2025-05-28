@@ -21,6 +21,13 @@
       padding: 20px;
       margin: 0;
       min-height: 100vh;
+      box-sizing: border-box; /* Adicionado para melhor cálculo de padding */
+    }
+    .main-content-wrapper { /* NOVO WRAPPER */
+      display: flex;
+      flex-direction: column; 
+      align-items: center;
+      width: 100%;
     }
     .cover {
       width: 100%; max-width: 300px;
@@ -31,6 +38,7 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.5),
                   0 0 20px #fff, 0 0 40px #fff;
       transition: box-shadow .3s ease;
+      display: block; /* Para evitar espaço extra abaixo da imagem */
     }
     .cover img:hover {
       box-shadow: 0 4px 12px rgba(0,0,0,0.5),
@@ -84,8 +92,8 @@
       border-left: 1px solid #444; margin-top: 5px;
     }
     .menu-item#indique-btn {
-  color: #25D366; /* Cor verde do WhatsApp */
-}
+      color: #25D366; /* Cor verde do WhatsApp */
+    }
     .submenu-item {
       padding: 6px 8px; cursor: pointer;
       display: flex; align-items: center;
@@ -181,7 +189,7 @@
     .share-icon svg { width: 24px; height: 24px; fill: white; }
     .whatsapp-icon { background-color: #25D366; }
     .facebook-icon { background-color: #1877F2; }
-    .twitter-icon { background-color: #000; } /* Note: Twitter is now X, icon might need update if a specific X icon is desired */
+    .twitter-icon { background-color: #000; }
     .email-icon { background-color: #EA4335; }
     .link-icon { background-color: #5f6368; }
     .share-link {
@@ -222,27 +230,98 @@
     .report-form textarea {
       padding: 8px; border: 1px solid #444;
       border-radius: 4px; background: #111;
-      color: #fff; margin-top: 4px; resize: none; /* Added resize: none as it's common for textareas in dialogs */
+      color: #fff; margin-top: 4px; resize: none;
     }
     .report-form button {
       display: flex; align-items: center;
       justify-content: center; gap: 8px;
-      padding: 10px; background: #25D366; /* Using a green similar to WhatsApp for send action */
+      padding: 10px; background: #25D366;
       color: #fff; border: none; border-radius: 4px;
       cursor: pointer;
     }
-    /* Adicionando estilo para o botão de fechar do report dialog, similar ao .close-share */
-    .close-report { /* Este seletor estava faltando, mas é referenciado no HTML */
+    .close-report {
       position: absolute; top: 10px; right: 10px;
       background: none; border: none; color: #aaa;
       font-size: 20px; cursor: pointer;
     }
 
-
     @media (max-width: 400px) {
       .control-btn { width: 50px; height: 50px; }
       .control-btn .material-icons { font-size: 24px; }
       .track-title { font-size: 18px; }
+    }
+
+    /* ESTILOS PARA MODO PAISAGEM (LANDSCAPE) */
+    @media (orientation: landscape) and (max-height: 550px) { /* Ajustado max-height para melhor aplicabilidade */
+      body {
+        padding: 10px; /* Reduz padding do body em paisagem */
+        overflow-y: hidden; /* Previne scroll no body em paisagem se o conteúdo couber */
+      }
+      .main-content-wrapper {
+        flex-direction: row; 
+        align-items: flex-start; 
+        justify-content: center; 
+        gap: 15px; 
+        height: calc(100vh - 20px); /* Ocupa altura da viewport menos padding do body */
+        width: 100%;
+      }
+
+      .cover {
+        flex: 0 0 auto; 
+        width: auto; /* Deixa a altura ditar a largura proporcional */
+        max-width: 22vh; /* Baseado na altura da viewport, ajuste se necessário */
+        max-height: calc(100% - 0px); /* Ocupa altura do wrapper */
+        margin-bottom: 0;
+        margin-right: 10px; /* Espaço entre capa e player */
+      }
+      .cover img {
+        width: auto; /* Para manter proporção com altura */
+        height: 100%; /* Ocupa a altura do .cover */
+        max-height: 100%; /* Garante que a imagem caiba na altura */
+        object-fit: contain; 
+      }
+
+      .player {
+        flex: 1 1 auto; 
+        max-width: 60%; /* Ajuste para não ficar muito largo */
+        height: 100%; /* Ocupa altura do wrapper */
+        max-height: 100%;
+        overflow-y: auto; /* Permite scroll interno no player */
+        padding: 15px;
+      }
+      
+      .track-header {
+        margin-bottom:10px;
+      }
+      .track-title {
+        font-size: 18px; 
+      }
+      .album-title {
+        font-size: 12px;
+      }
+      .controls {
+        margin-bottom:10px;
+      }
+      .control-btn {
+        width: 50px; height: 50px;
+      }
+      .control-btn .material-icons {
+        font-size: 26px;
+      }
+      .progress-speed {
+        margin-top:5px;
+      }
+      .time-info {
+        margin-top:3px;
+      }
+      .playlist {
+        /* Ajusta a altura da playlist para caber melhor e permitir scroll */
+        max-height: calc(100% - 220px); /* Ajuste este valor conforme a altura dos outros elementos do player */
+        font-size: 13px;
+      }
+      .playlist-item {
+        padding: 8px;
+      }
     }
   </style>
 
@@ -310,165 +389,169 @@
   </svg>
 </head>
 <body>
+  <div class="main-content-wrapper"> 
+    <div class="cover">
+      <img id="cover-image"
+           src="https://live.staticflickr.com/65535/54488171468_d37b7e80c9_n.jpg"
+           alt="Capa do Álbum" />
+    </div>
 
-  <div class="cover">
-    <img id="cover-image"
-         src="https://live.staticflickr.com/65535/54488171468_d37b7e80c9_n.jpg"
-         alt="Capa do Álbum" />
-  </div>
-
-  <div class="player">
-    <div class="track-header">
-      <div class="track-title-container">
-        <div class="track-title" id="track-title">
-          Selecione um Capítulo
+    <div class="player">
+      <div class="track-header">
+        <div class="track-title-container">
+          <div class="track-title" id="track-title">
+            Selecione um Capítulo
+          </div>
+          <div class="album-title" id="album-title">
+            Humildade a Beleza da Santidade
+          </div>
+          <button class="menu-btn" id="menu-btn">⋮</button>
         </div>
-        <div class="album-title" id="album-title">
-          Humildade a Beleza da Santidade
-        </div>
-        <button class="menu-btn" id="menu-btn">⋮</button>
-      </div>
-      <div class="menu" id="menu">
-        <div class="menu-item" id="timer-btn">
-          <span class="material-icons">brightness_3</span>
-          Temporizador
-           </div>
-           <div class="menu-item" id="buy-book-btn">
-          <span class="material-icons">shopping_cart</span>
-          Comprar o Livro
-        </div>
-        <div class="submenu" id="timer-submenu">
-          <div class="submenu-item" data-time="300">5 minutos</div>
-          <div class="submenu-item" data-time="600">10 minutos</div>
-          <div class="submenu-item" data-time="900">15 minutos</div>
-          <div class="submenu-item" data-time="1800">30 minutos</div>
-          <div class="submenu-item" data-time="3600">1 hora</div>
-          <div class="submenu-item" data-time="0">
-            <span class="material-icons">cancel</span>
-            Desativar
+        <div class="menu" id="menu">
+          <div class="menu-item" id="timer-btn">
+            <span class="material-icons">brightness_3</span>
+            Temporizador
+            </div>
+            <div class="menu-item" id="buy-book-btn">
+            <span class="material-icons">shopping_cart</span>
+            Comprar o Livro
+          </div>
+          <div class="submenu" id="timer-submenu">
+            <div class="submenu-item" data-time="300">5 minutos</div>
+            <div class="submenu-item" data-time="600">10 minutos</div>
+            <div class="submenu-item" data-time="900">15 minutos</div>
+            <div class="submenu-item" data-time="1800">30 minutos</div>
+            <div class="submenu-item" data-time="3600">1 hora</div>
+            <div class="submenu-item" data-time="0">
+              <span class="material-icons">cancel</span>
+              Desativar
+            </div>
+          </div>
+          <div class="menu-item" id="share-btn">
+            <span class="material-icons">share</span>
+            Compartilhar Capítulo
+          </div>
+          <div class="menu-item" id="indique-btn">
+            <span class="material-icons">thumb_up</span>
+            Indique o Arauto+
+          </div>
+          <div class="menu-item" id="report-btn">
+            <span class="material-icons">report_problem</span>
+            Reportar Problema
           </div>
         </div>
-        <div class="menu-item" id="share-btn">
-          <span class="material-icons">share</span>
-          Compartilhar Capítulo
+      </div>
+
+      <div class="controls">
+        <button id="prev-btn" class="control-btn" title="Anterior">
+          <span class="material-icons">skip_previous</span>
+        </button>
+        <button id="play-btn" class="control-btn" title="Play/Pause">
+          <span class="material-icons" id="play-icon">play_arrow</span>
+          <span class="material-icons" id="pause-icon" style="display:none">
+            pause
+          </span>
+        </button>
+        <button id="next-btn" class="control-btn" title="Próxima">
+          <span class="material-icons">skip_next</span>
+        </button>
+      </div>
+
+      <div class="progress-speed">
+        <div class="progress-bar" id="progress-bar">
+          <div class="progress" id="progress"></div>
         </div>
-        <div class="menu-item" id="indique-btn">
-  <span class="material-icons">thumb_up</span>
-  Indique o Arauto+
-</div>
-        <div class="menu-item" id="report-btn">
-          <span class="material-icons">report_problem</span>
-          Reportar Problema
+        <div class="speed-control">
+          <select id="speed-select">
+            <option value="0.5">0.5x</option>
+            <option value="1" selected>1x</option>
+            <option value="1.5">1.5x</option>
+            <option value="2">2x</option>
+          </select>
         </div>
       </div>
-    </div>
 
-    <div class="controls">
-      <button id="prev-btn" class="control-btn" title="Anterior">
-        <span class="material-icons">skip_previous</span>
-      </button>
-      <button id="play-btn" class="control-btn" title="Play/Pause">
-        <span class="material-icons" id="play-icon">play_arrow</span>
-        <span class="material-icons" id="pause-icon" style="display:none">
-          pause
-        </span>
-      </button>
-      <button id="next-btn" class="control-btn" title="Próxima">
-        <span class="material-icons">skip_next</span>
-      </button>
-    </div>
-
-    <div class="progress-speed">
-      <div class="progress-bar" id="progress-bar">
-        <div class="progress" id="progress"></div>
+      <div class="time-info">
+        <span id="current-time">00:00</span>
+        <span id="total-time">00:00</span>
       </div>
-      <div class="speed-control">
-        <select id="speed-select">
-          <option value="0.5">0.5x</option>
-          <option value="1" selected>1x</option>
-          <option value="1.5">1.5x</option>
-          <option value="2">2x</option>
-        </select>
-      </div>
-    </div>
 
-    <div class="time-info">
-      <span id="current-time">00:00</span>
-      <span id="total-time">00:00</span>
-    </div>
+      <audio id="audio-player"
+             preload="metadata"
+             crossorigin="anonymous"></audio>
 
-    <audio id="audio-player"
-           preload="metadata"
-           crossorigin="anonymous"></audio>
-
-    <div class="playlist" id="playlist">
+      <div class="playlist" id="playlist">
           <div class="playlist-item"
-           data-src="https://archive.org/download/6_20250430_20250430/1.MP3"
-           data-title="1. Humildade: A glória da criatura">
-        1 - Humildade: A glória da criatura
+               data-src="https://archive.org/download/6_20250430_20250430/1.MP3"
+               data-title="1. Humildade: A glória da criatura">
+            1 - Humildade: A glória da criatura
+          </div>
+          <div class="playlist-item"
+               data-src="https://archive.org/download/6_20250430_20250430/2.MP3"
+               data-title="2. Humildade: O segredo da redenção">
+            2 - Humildade: O segredo da redenção
+          </div>
+          <div class="playlist-item"
+               data-src="https://archive.org/download/6_20250430_20250430/3.MP3"
+               data-title="3. A Humildade de Jesus">
+            3 - A Humildade de Jesus
+          </div>
+          <div class="playlist-item"
+               data-src="https://archive.org/download/6_20250430_20250430/4.MP3"
+               data-title="4. Humildade no ensinamento de Jesus">
+            4 - Humildade no ensinamento de Jesus
+          </div>
+          <div class="playlist-item"
+               data-src="https://archive.org/download/6_20250430_20250430/5.MP3"
+               data-title="5. Humildade nos discípulos de Jesus">
+            5 - Humildade nos discípulos de Jesus
+          </div>
+          <div class="playlist-item"
+               data-src="https://archive.org/download/6_20250430_20250430/6.MP3"
+               data-title="6. Humildade na vida cotidiana">
+            6 - Humildade na vida cotidiana
+          </div>
+          <div class="playlist-item"
+               data-src="https://archive.org/download/6_20250430_20250430/7.MP3"
+               data-title="7. Humildade e santidade">
+            7 - Humildade e santidade
+          </div>
+          <div class="playlist-item"
+               data-src="https://archive.org/download/6_20250430_20250430/8.MP3"
+               data-title="8. Humildade e pecado">
+            8 - Humildade e pecado
+          </div>
+          <div class="playlist-item"
+               data-src="https://archive.org/download/6_20250430_20250430/9.MP3"
+               data-title="9. Humildade e fé">
+            9 - Humildade e fé
+          </div>
+          <div class="playlist-item"
+               data-src="https://archive.org/download/6_20250430_20250430/10.MP3"
+               data-title="10. Humildade e a morte de si próprio">
+            10 - Humildade e a morte de si próprio
+          </div>
+          <div class="playlist-item"
+               data-src="https://archive.org/download/6_20250430_20250430/11.MP3"
+               data-title="11. Humildade e felicidade">
+            11 - Humildade e felicidade
+          </div>
+          <div class="playlist-item"
+               data-src="https://archive.org/download/6_20250430_20250430/12.MP3"
+               data-title="12. Humildade e exaltação">
+            12 - Humildade e exaltação
+          </div>
+          <div class="playlist-item"
+               data-src="https://archive.org/download/6_20250430_20250430/13.MP3"
+               data-title="13. Uma oração por humildade">
+            13 - Uma oração por humildade
+          </div>
       </div>
-      <div class="playlist-item"
-           data-src="https://archive.org/download/6_20250430_20250430/2.MP3"
-           data-title="2. Humildade: O segredo da redenção">
-        2 - Humildade: O segredo da redenção
-      </div>
-      <div class="playlist-item"
-           data-src="https://archive.org/download/6_20250430_20250430/3.MP3"
-           data-title="3. A Humildade de Jesus">
-        3 - A Humildade de Jesus
-      </div>
-      <div class="playlist-item"
-           data-src="https://archive.org/download/6_20250430_20250430/4.MP3"
-           data-title="4. Humildade no ensinamento de Jesus">
-        4 - Humildade no ensinamento de Jesus
-      </div>
-      <div class="playlist-item"
-           data-src="https://archive.org/download/6_20250430_20250430/5.MP3"
-           data-title="5. Humildade nos discípulos de Jesus">
-        5 - Humildade nos discípulos de Jesus
-      </div>
-      <div class="playlist-item"
-           data-src="https://archive.org/download/6_20250430_20250430/6.MP3"
-           data-title="6. Humildade na vida cotidiana">
-        6 - Humildade na vida cotidiana
-      </div>
-      <div class="playlist-item"
-           data-src="https://archive.org/download/6_20250430_20250430/7.MP3"
-           data-title="7. Humildade e santidade">
-        7 - Humildade e santidade
-      </div>
-      <div class="playlist-item"
-           data-src="https://archive.org/download/6_20250430_20250430/8.MP3"
-           data-title="8. Humildade e pecado">
-        8 - Humildade e pecado
-      </div>
-      <div class="playlist-item"
-           data-src="https://archive.org/download/6_20250430_20250430/9.MP3"
-           data-title="9. Humildade e fé">
-        9 - Humildade e fé
-      </div>
-      <div class="playlist-item"
-           data-src="https://archive.org/download/6_20250430_20250430/10.MP3"
-           data-title="10. Humildade e a morte de si próprio">
-        10 - Humildade e a morte de si próprio
-      </div>
-      <div class="playlist-item"
-           data-src="https://archive.org/download/6_20250430_20250430/11.MP3"
-           data-title="11. Humildade e felicidade">
-        11 - Humildade e felicidade
-      </div>
-      <div class="playlist-item"
-           data-src="https://archive.org/download/6_20250430_20250430/12.MP3"
-           data-title="12. Humildade e exaltação">
-        12 - Humildade e exaltação
-      </div>
-      <div class="playlist-item"
-           data-src="https://archive.org/download/6_20250430_20250430/13.MP3"
-           data-title="13. Uma oração por humildade">
-        13 - Uma oração por humildade
-      </div>
-    </div>
-    </div> <div class="overlay" id="share-overlay"></div>
+    </div> 
+  </div>
+
+
+  <div class="overlay" id="share-overlay"></div>
   <div class="share-dialog" id="share-dialog">
     <button class="close-share" id="close-share">&times;</button>
     <h3>Compartilhar Capítulo</h3>
@@ -478,7 +561,9 @@
       <span class="material-icons">content_copy</span>
       Copiar Link
     </button>
-  </div> <div class="overlay" id="report-overlay"></div>
+  </div> 
+  
+  <div class="overlay" id="report-overlay"></div>
   <div class="report-dialog" id="report-dialog">
     <button class="close-report" id="close-report">&times;</button>
     <h3>Reportar Problema</h3>
@@ -505,229 +590,357 @@
     </form>
   </div>
 
- <script>
-    const audioPlayer   = document.getElementById('audio-player'),
-          playBtn       = document.getElementById('play-btn'),
-          prevBtn       = document.getElementById('prev-btn'),
-          nextBtn       = document.getElementById('next-btn'),
-          playIcon      = document.getElementById('play-icon'),
-          pauseIcon     = document.getElementById('pause-icon'),
-          progressBar   = document.getElementById('progress-bar'),
-          progress      = document.getElementById('progress'),
-          currentTimeEl = document.getElementById('current-time'),
-          totalTimeEl   = document.getElementById('total-time'),
-          speedSelect   = document.getElementById('speed-select'),
-          tracks        = Array.from(document.querySelectorAll('.playlist-item')),
-          menuBtn       = document.getElementById('menu-btn'),
-          menu          = document.getElementById('menu'),
-          timerBtn      = document.getElementById('timer-btn'),
-          timerSubmenu  = document.getElementById('timer-submenu'),
-          downloadBtn   = document.getElementById('download-audio'),
-          shareBtn      = document.getElementById('share-btn'),
-          shareDialog   = document.getElementById('share-dialog'),
-          shareOverlay  = document.getElementById('share-overlay'),
-          closeShare    = document.getElementById('close-share'),
-          shareLink     = document.getElementById('share-link'),
-          copyLinkBtn   = document.getElementById('copy-link'),
-          shareOptions  = document.getElementById('share-options'),
-          coverImage    = document.getElementById('cover-image');
+  <script>
+    const audioPlayer   = document.getElementById('audio-player'),
+          playBtn       = document.getElementById('play-btn'),
+          prevBtn       = document.getElementById('prev-btn'),
+          nextBtn       = document.getElementById('next-btn'),
+          playIcon      = document.getElementById('play-icon'),
+          pauseIcon     = document.getElementById('pause-icon'),
+          progressBar   = document.getElementById('progress-bar'),
+          progress      = document.getElementById('progress'),
+          currentTimeEl = document.getElementById('current-time'),
+          totalTimeEl   = document.getElementById('total-time'),
+          speedSelect   = document.getElementById('speed-select'),
+          tracks        = Array.from(document.querySelectorAll('.playlist-item')),
+          menuBtn       = document.getElementById('menu-btn'),
+          menu          = document.getElementById('menu'),
+          timerBtn      = document.getElementById('timer-btn'),
+          timerSubmenu  = document.getElementById('timer-submenu'),
+          shareBtn      = document.getElementById('share-btn'),
+          shareDialog   = document.getElementById('share-dialog'),
+          shareOverlay  = document.getElementById('share-overlay'),
+          closeShare    = document.getElementById('close-share'),
+          shareLink     = document.getElementById('share-link'),
+          copyLinkBtn   = document.getElementById('copy-link'),
+          shareOptions  = document.getElementById('share-options'),
+          coverImage    = document.getElementById('cover-image');
+          // downloadBtn foi removido pois não existe no modelo
+    
+    // Adicionadas as constantes para os novos botões do menu
+    const buyBookBtn = document.getElementById('buy-book-btn');
+    const indiqueBtn = document.getElementById('indique-btn');
 
-    let currentIndex = 0,
-        isPlaying    = false,
-        timerId      = null,
+
+    let currentIndex = 0,
+        isPlaying    = false,
+        timerId      = null,
         tempoParaRetomar = null;
 
-    function formatTime(sec) {
-      const m = Math.floor(sec/60),
-            s = Math.floor(sec%60);
-      return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-    }
+    function formatTime(sec) {
+      const m = Math.floor(sec/60),
+            s = Math.floor(sec%60);
+      return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    }
 
-    function updateMetadata() {
-      const title = tracks[currentIndex].dataset.title;
-      document.title = `${title} –  Humildade a Beleza da Santidade`;
-      audioPlayer.playbackRate = parseFloat(speedSelect.value);
-      document.getElementById('track-title').textContent = title;
+    function updateMetadata() {
+      if (tracks.length === 0 || !tracks[currentIndex]) {
+        document.getElementById('track-title').textContent = "Nenhuma faixa selecionada";
+         if ('mediaSession' in navigator) {
+            navigator.mediaSession.metadata = null;
+            navigator.mediaSession.playbackState = "none";
+        }
+        return;
+      }
+      const title = tracks[currentIndex].dataset.title;
+      document.title = `${title} – Humildade a Beleza da Santidade`;
+      audioPlayer.playbackRate = parseFloat(speedSelect.value);
+      document.getElementById('track-title').textContent = title;
 
-      if ('mediaSession' in navigator) {
-        navigator.mediaSession.metadata = new MediaMetadata({
-          title,
-          artist: 'Humildade a Beleza da Santidade',
-          artwork: [{ src: coverImage.src, sizes:'300x300', type:'image/jpeg' }]
-        });
-        navigator.mediaSession.playbackState = isPlaying ? 'playing' : 'paused';
-        navigator.mediaSession.setActionHandler('play', playPause);
-        navigator.mediaSession.setActionHandler('pause', playPause);
-        navigator.mediaSession.setActionHandler('previoustrack', prevTrack);
-        navigator.mediaSession.setActionHandler('nexttrack', nextTrack);
-      }
-    }
+      if ('mediaSession' in navigator) {
+        navigator.mediaSession.metadata = new MediaMetadata({
+          title,
+          artist: 'Humildade a Beleza da Santidade',
+          artwork: [{ src: coverImage.src, sizes:'300x300', type:'image/jpeg' }]
+        });
+        navigator.mediaSession.playbackState = isPlaying ? 'playing' : 'paused';
+        navigator.mediaSession.setActionHandler('play', playPause);
+        navigator.mediaSession.setActionHandler('pause', playPause);
+        navigator.mediaSession.setActionHandler('previoustrack', prevTrack);
+        navigator.mediaSession.setActionHandler('nexttrack', nextTrack);
+      }
+    }
 
-    function loadTrack(i) {
-      tracks.forEach(t => t.classList.remove('active'));
-      tracks[i].classList.add('active');
-      currentIndex = i;
+    function loadTrack(i) {
+      let trackIndex = parseInt(i, 10); 
+      if (isNaN(trackIndex) || tracks.length === 0 || trackIndex < 0 || trackIndex >= tracks.length) {
+        console.warn("Índice de faixa inválido. Lista de faixas:", tracks.length, "Índice tentado:", i);
+        if (tracks.length > 0) {
+            trackIndex = 0; 
+            console.log("Recaindo para a faixa 0.");
+        } else {
+            document.getElementById('track-title').textContent = "Playlist vazia.";
+            if ('mediaSession' in navigator) {
+                navigator.mediaSession.metadata = null;
+                navigator.mediaSession.playbackState = "none";
+            }
+            return; 
+        }
+      }
+      
+      tracks.forEach(t => t.classList.remove('active'));
+      tracks[trackIndex].classList.add('active');
+      currentIndex = trackIndex;
       localStorage.setItem('arauto_lastTrackIndex', currentIndex);
+      
+      if (audioPlayer.currentSrc !== tracks[currentIndex].dataset.src) {
+          audioPlayer.src = tracks[currentIndex].dataset.src;
+          audioPlayer.load();
+      } else {
+          updateMetadata();
+      }
+      if (timerId) { clearTimeout(timerId); timerId = null; }
+    }
 
-      audioPlayer.src = tracks[i].dataset.src;
-      audioPlayer.load();
-      updateMetadata();
-      if (timerId) { clearTimeout(timerId); timerId = null; }
-    }
+    function playPause() {
+      if (tracks.length === 0) return;
+      if (!audioPlayer.currentSrc && tracks.length > 0) {
+         loadTrack(currentIndex); 
+      }
+      
+      if (audioPlayer.paused) {
+        const playPromise = audioPlayer.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(error => {
+            console.error("Erro ao executar play():", error);
+          });
+        }
+      } else {
+        audioPlayer.pause();
+      }
+    }
 
-    function playPause() {
-      if (!audioPlayer.src) loadTrack(currentIndex);
-      audioPlayer.paused ? audioPlayer.play() : audioPlayer.pause();
-    }
-    function prevTrack() {
-      loadTrack((currentIndex-1+tracks.length)%tracks.length);
-      audioPlayer.play();
-    }
-    function nextTrack() {
-      loadTrack((currentIndex+1)%tracks.length);
-      audioPlayer.play();
-    }
+    function prevTrack() {
+      if (tracks.length === 0) return;
+      let newIndex = (currentIndex - 1 + tracks.length) % tracks.length;
+      loadTrack(newIndex);
+      audioPlayer.play().catch(e => console.error("Erro ao tocar faixa anterior:", e));
+    }
 
-    // Eventos do áudio
-    audioPlayer.addEventListener('loadedmetadata', () => {
-      totalTimeEl.textContent = formatTime(audioPlayer.duration);
+    function nextTrack() {
+      if (tracks.length === 0) return;
+      let newIndex = (currentIndex + 1) % tracks.length;
+      loadTrack(newIndex);
+      audioPlayer.play().catch(e => console.error("Erro ao tocar próxima faixa:", e));
+    }
 
-      if (tempoParaRetomar) {
-        audioPlayer.currentTime = tempoParaRetomar;
+    audioPlayer.addEventListener('loadedmetadata', () => {
+      if (!audioPlayer.duration || isNaN(audioPlayer.duration)) {
+        totalTimeEl.textContent = "00:00";
+        return;
+      }
+      totalTimeEl.textContent = formatTime(audioPlayer.duration);
+      updateMetadata(); 
+      if (tempoParaRetomar && audioPlayer.seekable && audioPlayer.seekable.length > 0) { 
+        const seekTime = Math.min(tempoParaRetomar, audioPlayer.duration);
+        if (!isNaN(seekTime)) {
+             audioPlayer.currentTime = seekTime;
+        }
         tempoParaRetomar = null;
       }
-    });
-    audioPlayer.addEventListener('timeupdate', () => {
-      if (!audioPlayer.duration) return;
-      progress.style.width = `${(audioPlayer.currentTime/audioPlayer.duration)*100}%`;
-      currentTimeEl.textContent = formatTime(audioPlayer.currentTime);
-      
-      if (isPlaying) {
+    });
+    audioPlayer.addEventListener('timeupdate', () => {
+      if (!audioPlayer.duration || isNaN(audioPlayer.duration)) return;
+      progress.style.width = `${(audioPlayer.currentTime/audioPlayer.duration)*100}%`;
+      currentTimeEl.textContent = formatTime(audioPlayer.currentTime);
+      if (isPlaying && audioPlayer.currentTime > 0 && !isNaN(audioPlayer.currentTime)) { 
         localStorage.setItem('arauto_lastTrackTime', audioPlayer.currentTime);
       }
-    });
-    audioPlayer.addEventListener('play', () => {
-      isPlaying = true;
-      playIcon.style.display = 'none';
-      pauseIcon.style.display = 'inline';
-      updateMetadata();
-    });
-    audioPlayer.addEventListener('pause', () => {
-      isPlaying = false;
-      playIcon.style.display = 'inline';
-      pauseIcon.style.display = 'none';
-      updateMetadata();
-    });
-    audioPlayer.addEventListener('ended', nextTrack);
+    });
+    audioPlayer.addEventListener('play', () => {
+      isPlaying = true;
+      playIcon.style.display = 'none';
+      pauseIcon.style.display = 'inline';
+      updateMetadata();
+    });
+    audioPlayer.addEventListener('pause', () => {
+      isPlaying = false;
+      playIcon.style.display = 'inline';
+      pauseIcon.style.display = 'none';
+      updateMetadata();
+    });
+    audioPlayer.addEventListener('ended', nextTrack);
+    audioPlayer.addEventListener('error', (e) => {
+        console.error("Erro no elemento de áudio:", audioPlayer.error);
+        let errorMsg = "Ocorreu um erro com o áudio.";
+        if (audioPlayer.error) {
+            switch (audioPlayer.error.code) {
+                case MediaError.MEDIA_ERR_ABORTED: errorMsg = "A reprodução do áudio foi abortada."; break;
+                case MediaError.MEDIA_ERR_NETWORK: errorMsg = "Ocorreu um erro de rede ao carregar o áudio."; break;
+                case MediaError.MEDIA_ERR_DECODE: errorMsg = "Ocorreu um erro ao decodificar o áudio."; break;
+                case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED: errorMsg = "O formato do áudio não é suportado ou o áudio não pode ser encontrado."; break;
+            }
+        }
+        isPlaying = false; 
+        playIcon.style.display = 'inline';
+        pauseIcon.style.display = 'none';
+        updateMetadata();
+    });
 
-    // Controles
-    playBtn.addEventListener('click', playPause);
-    prevBtn.addEventListener('click', prevTrack);
-    nextBtn.addEventListener('click', nextTrack);
+    playBtn.addEventListener('click', playPause);
+    prevBtn.addEventListener('click', prevTrack);
+    nextBtn.addEventListener('click', nextTrack);
 
-    progressBar.addEventListener('click', e => {
-      const rect = progressBar.getBoundingClientRect();
-      audioPlayer.currentTime = ((e.clientX - rect.left)/rect.width)*audioPlayer.duration;
-    });
-    speedSelect.addEventListener('change', updateMetadata);
+    progressBar.addEventListener('click', e => {
+      if (!audioPlayer.duration || isNaN(audioPlayer.duration)) return;
+      const rect = progressBar.getBoundingClientRect();
+      audioPlayer.currentTime = ((e.clientX - rect.left)/rect.width)*audioPlayer.duration;
+    });
+    speedSelect.addEventListener('change', updateMetadata);
 
-    tracks.forEach((el, idx) =>
-      el.addEventListener('click', () => {
-        loadTrack(idx);
-        playPause();
-      })
-    );
+    tracks.forEach((el, idx) =>
+      el.addEventListener('click', () => {
+        loadTrack(idx);
+        playPause();
+      })
+    );
 
-    // Temporizador
-    timerBtn.addEventListener('click', e => {
-      e.stopPropagation();
-      timerSubmenu.style.display = timerSubmenu.style.display === 'block' ? 'none' : 'block';
-    });
-    document.querySelectorAll('#timer-submenu .submenu-item').forEach(item => {
-      item.addEventListener('click', e => {
-        e.stopPropagation();
-        const secs = parseInt(item.dataset.time, 10), label = item.textContent.trim();
-        if (secs > 0) {
-          clearTimeout(timerId);
-          timerId = setTimeout(() => {
-            audioPlayer.pause();
-            alert('Temporizador concluído – reprodução pausada');
-            timerId = null;
-          }, secs*1000);
-          alert(`Temporizador definido para ${label}`);
-        } else {
-          clearTimeout(timerId);
-          timerId = null;
-          alert('Temporizador desativado');
-        }
-        menu.style.display = 'none';
-        timerSubmenu.style.display = 'none';
-      });
-    });
-    
-    // === Comprar Livro ===
-    const buyBookBtn = document.getElementById('buy-book-btn');
-    if (buyBookBtn) {
-      buyBookBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        menu.style.display = 'none';
-        const bookUrl = 'https://amzn.to/4kdu3B4';
-        window.open(bookUrl, '_blank');
-      });
-    }
+    timerBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      timerSubmenu.style.display = timerSubmenu.style.display === 'block' ? 'none' : 'block';
+    });
+    document.querySelectorAll('#timer-submenu .submenu-item').forEach(item => {
+      item.addEventListener('click', e => {
+        e.stopPropagation();
+        const secs = parseInt(item.dataset.time, 10), label = item.textContent.trim();
+        if (secs > 0) {
+          clearTimeout(timerId);
+          timerId = setTimeout(() => {
+            audioPlayer.pause();
+            alert('Temporizador concluído – reprodução pausada');
+            timerId = null;
+          }, secs*1000);
+          alert(`Temporizador definido para ${label}`);
+        } else {
+          clearTimeout(timerId);
+          timerId = null;
+          alert('Temporizador desativado');
+        }
+        menu.style.display = 'none';
+        timerSubmenu.style.display = 'none';
+      });
+    });
+    
+    if (buyBookBtn) {
+      buyBookBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        menu.style.display = 'none';
+        const bookUrl = 'https://amzn.to/4kdu3B4'; 
+        window.open(bookUrl, '_blank');
+      });
+    }
 
-    // Menu geral
-    menuBtn.addEventListener('click', e => {
-      e.stopPropagation();
-      menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
-    });
-    document.addEventListener('click', () => {
-      menu.style.display = 'none';
-      timerSubmenu.style.display = 'none';
-    });
+    if (indiqueBtn) {
+        indiqueBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            menu.style.display = 'none';
+            const texto = `Seu amigo te indicou para conhecer o *Arauto Audiobook*! ${String.fromCodePoint(0x1F3A7)}
+            
+*TORNE-SE MEMBRO VITALÍCIO* e garanta sua edificação com os *melhores audiobooks Cristãos*!
+                
+${String.fromCodePoint(0x1F449)} Clique no link e descubra como! ${String.fromCodePoint(0x1F525)}
 
-    // Compartilhar
-    function showShareDialog() {
+https://arautomais.github.io/Membro-vitalicio-ilimitado/`;
+            window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank');
+        });
+    }
+
+    menuBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    });
+    document.addEventListener('click', () => {
+      menu.style.display = 'none';
+      timerSubmenu.style.display = 'none';
+    });
+
+    function showShareDialog() {
+      if (tracks.length === 0 || !tracks[currentIndex]) return;
       const track = tracks[currentIndex];
-      const mensagemCompleta = `*Você nem sabe!* 💖\n\nEstava ouvindo o capítulo "${track.dataset.title}" no *Aplicativo de AudioBooks-Arauto* e imediatamente pensei em você! ✨\n\n*Vou deixar o link aqui pra você ouvir também*:\n${track.dataset.src}\n\n_Depois me conta o que achou!_ 🤗\n\n\n(*P.S.: Tem muitas outras pérolas esperando por você em*: https://arautomais.github.io/Membro-vitalicio-ilimitado/)`;
+      const mensagemCompleta = `*Você nem sabe!* 💖
+
+Estava ouvindo o capítulo "${track.dataset.title}" no *Aplicativo de AudioBooks-Arauto* e imediatamente pensei em você! ✨
+
+*Vou deixar o link aqui pra você ouvir também*:
+${track.dataset.src}
+
+_Depois me conta o que achou!_ 🤗
+
+
+(*P.S.: Tem muitas outras pérolas esperando por você em*: https://arautomais.github.io/Membro-vitalicio-ilimitado/)`;
+
       shareLink.value = mensagemCompleta;
       shareOverlay.style.display = 'block';
       shareDialog.style.display = 'block';
       shareOptions.innerHTML = '';
+
       if (navigator.share) {
         const ns = document.createElement('div');
         ns.className = 'share-option';
-        ns.innerHTML = `<div class="share-icon link-icon"><svg><use href="#link-icon"/></svg></div><span>Compartilhar Capítulo</span>`;
+        ns.innerHTML = `
+          <div class="share-icon link-icon"><svg><use href="#link-icon"/></svg></div>
+          <span>Compartilhar Capítulo</span>
+        `;
         ns.addEventListener('click', async () => {
           try {
-            await navigator.share({ title: `Ouça: ${track.dataset.title}`, text: `Estou ouvindo este capítulo no Aplicativo Arauto e pensei em você! 💖`, url: track.dataset.src });
+            await navigator.share({
+              title: `Ouça: ${track.dataset.title}`,
+              text: `Estou ouvindo este capítulo no Aplicativo Arauto e pensei em você! 💖`,
+              url: track.dataset.src
+            });
             closeShareDialog();
           } catch {}
         });
         shareOptions.appendChild(ns);
       }
-      const socials = [ { name:'WhatsApp', icon:'whatsapp-icon', url:`https://wa.me/?text=${encodeURIComponent(mensagemCompleta)}` }, { name:'Facebook', icon:'facebook-icon', url:`https://www.facebook.com/sharer/sharer.php?quote=${encodeURIComponent('Estou ouvindo no Arauto e pensei em você! ❤️ ' + track.dataset.title)}&u=${encodeURIComponent(track.dataset.src)}` }, { name:'X (Twitter)', icon:'twitter-icon', url:`https://twitter.com/intent/tweet?text=${encodeURIComponent('Acabei de encontrar essa joia no @ArautoApp e pensei em você! ❤️ Ouça "' + track.dataset.title + '" aqui: ')}&url=${encodeURIComponent(track.dataset.src)}` }, { name:'Email', icon:'email-icon', url:`mailto:?subject=${encodeURIComponent('Pensei em você! ❤️ ' + track.dataset.title)}&body=${encodeURIComponent(mensagemCompleta)}` } ];
+
+      const socials = [
+        {
+          name:'WhatsApp', icon:'whatsapp-icon',
+          url:`https://wa.me/?text=${encodeURIComponent(mensagemCompleta)}`
+        },
+        {
+          name:'Facebook', icon:'facebook-icon',
+          url:`https://www.facebook.com/sharer/sharer.php?quote=${encodeURIComponent('Estou ouvindo no Arauto e pensei em você! ❤️ ' + track.dataset.title)}&u=${encodeURIComponent(track.dataset.src)}`
+        },
+        {
+          name:'X (Twitter)', icon:'twitter-icon',
+          url:`https://twitter.com/intent/tweet?text=${encodeURIComponent('Acabei de encontrar essa joia no @ArautoApp e pensei em você! ❤️ Ouça "' + track.dataset.title + '" aqui: ')}&url=${encodeURIComponent(track.dataset.src)}`
+        },
+        {
+          name:'Email', icon:'email-icon',
+          url:`mailto:?subject=${encodeURIComponent('Pensei em você! ❤️ ' + track.dataset.title)}&body=${encodeURIComponent(mensagemCompleta)}`
+        }
+      ];
+      
       socials.forEach(s => {
         const o = document.createElement('a');
         o.className = 'share-option';
         o.href = s.url;
         o.target = '_blank';
         o.rel = 'noopener noreferrer';
-        o.innerHTML = `<div class="share-icon ${s.icon}"><svg><use href="#${s.icon}"/></svg></div><span>${s.name}</span>`;
+        o.innerHTML = `
+          <div class="share-icon ${s.icon}"><svg><use href="#${s.icon}"/></svg></div>
+          <span>${s.name}</span>
+        `;
         shareOptions.appendChild(o);
       });
     }
+
     function closeShareDialog() {
       shareOverlay.style.display = 'none';
       shareDialog.style.display = 'none';
     }
+
     shareBtn.addEventListener('click', e => {
       e.stopPropagation();
-      if (audioPlayer.src) showShareDialog();
+      if (audioPlayer.src && tracks.length > 0) showShareDialog();
       menu.style.display = 'none';
     });
+
     closeShare.addEventListener('click', closeShareDialog);
     shareOverlay.addEventListener('click', closeShareDialog);
+
     copyLinkBtn.addEventListener('click', () => {
       shareLink.select();
       try {
@@ -740,87 +953,92 @@
       }
     });
 
-    // indicar o arauto
-    const indiqueBtn = document.getElementById('indique-btn');
-    indiqueBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      menu.style.display = 'none';
-    
-      const texto = `Seu amigo te indicou para conhecer o *Arauto Audiobook*! ${String.fromCodePoint(0x1F3A7)}
-    
-*TORNE-SE MEMBRO VITALÍCIO* e garanta sua edificação com os *melhores audiobooks Cristãos*!
-      
-${String.fromCodePoint(0x1F449)} Clique no link e descubra como! ${String.fromCodePoint(0x1F525)}
+    const reportBtn     = document.getElementById('report-btn');
+    const reportOverlay = document.getElementById('report-overlay');
+    const reportDialog  = document.getElementById('report-dialog');
+    const closeReport   = document.getElementById('close-report');
+    const reportForm    = document.getElementById('report-form');
 
-https://arautomais.github.io/Membro-vitalicio-ilimitado/`; // <-- AQUI ESTAVA O ERRO, AGORA CORRIGIDO
-
-      window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank');
-    });
-    
-    // === Reportar Problema ===
-    const reportBtn = document.getElementById('report-btn'), reportOverlay = document.getElementById('report-overlay'), reportDialog = document.getElementById('report-dialog'), closeReport = document.getElementById('close-report'), reportForm = document.getElementById('report-form');
-    if (reportBtn) {
-        reportBtn.addEventListener('click', e => {
-          e.stopPropagation();
-          reportOverlay.style.display = 'block';
-          reportDialog.style.display = 'block';
-          menu.style.display = 'none';
-        });
-    }
-    if (closeReport) {
-        closeReport.addEventListener('click', () => {
-          reportOverlay.style.display = 'none';
-          reportDialog.style.display = 'none';
-        });
-    }
-    if (reportOverlay) {
-        reportOverlay.addEventListener('click', () => {
-          reportOverlay.style.display = 'none';
-          reportDialog.style.display = 'none';
-        });
-    }
-    if (reportForm) {
-       reportForm.addEventListener('submit', e => {
-          e.preventDefault();
-          const supportEmail = 'suportearauto@gmail.com';
-          const reference = document.getElementById('report-ref').value;
-          const book = document.getElementById('report-book').value;
-          const name = document.getElementById('report-name').value.trim();
-          const email = document.getElementById('report-email').value.trim();
-          const phone = document.getElementById('report-phone').value.trim();
-          const message = document.getElementById('report-message').value.trim();
-          const subject = encodeURIComponent(`Problema no player – ${reference} / ${book}`);
-          const body = encodeURIComponent(`Referência: ${reference}\nLivro: ${book}\nNome: ${name}\nEmail: ${email}\nTelefone: ${phone}\n\n${message}`);
-          const mailtoLink = `mailto:${supportEmail}?subject=${subject}&body=${body}`;
-          window.open(mailtoLink);
+    if (reportBtn) {
+        reportBtn.addEventListener('click', e => {
+          e.stopPropagation();
+          reportOverlay.style.display = 'block';
+          reportDialog.style.display  = 'block';
+          menu.style.display          = 'none';
+        });
+    }
+    if (closeReport) {
+        closeReport.addEventListener('click', () => {
           reportOverlay.style.display = 'none';
-          reportDialog.style.display = 'none';
-          reportForm.reset();
-        });
-    }
+          reportDialog.style.display  = 'none';
+        });
+    }
+    if (reportOverlay) {
+        reportOverlay.addEventListener('click', () => {
+          reportOverlay.style.display = 'none';
+          reportDialog.style.display  = 'none';
+        });
+    }
+    if (reportForm) {
+       reportForm.addEventListener('submit', e => {
+        e.preventDefault();
+        const supportEmail = 'suportearauto@gmail.com';
+        const reference = document.getElementById('report-ref').value;
+        const book      = document.getElementById('report-book').value;
+        const name      = document.getElementById('report-name').value.trim();
+        const email     = document.getElementById('report-email').value.trim();
+        const phone     = document.getElementById('report-phone').value.trim();
+        const message   = document.getElementById('report-message').value.trim();
+        const subject = encodeURIComponent(`Problema no player – ${reference} / ${book}`);
+        const body = encodeURIComponent(`Referência: ${reference}\nLivro: ${book}\nNome: ${name}\nEmail: ${email}\nTelefone: ${phone}\n\n${message}`);
+        const mailtoLink = `mailto:${supportEmail}?subject=${subject}&body=${body}`;
+        window.open(mailtoLink);
+        reportOverlay.style.display = 'none';
+        reportDialog.style.display  = 'none';
+        reportForm.reset();
+       });
+    }
     
     function iniciarPlayer() {
-        const indiceSalvo = localStorage.getItem('arauto_lastTrackIndex');
-        const tempoSalvo = localStorage.getItem('arauto_lastTrackTime');
+        const indiceSalvoStr = localStorage.getItem('arauto_lastTrackIndex');
+        const tempoSalvoStr = localStorage.getItem('arauto_lastTrackTime');
+        let indiceFinal = 0; 
 
-        if (indiceSalvo !== null) {
-            if (tempoSalvo) {
-                tempoParaRetomar = parseFloat(tempoSalvo);
+        if (indiceSalvoStr !== null) {
+            const indiceSalvoNum = parseInt(indiceSalvoStr, 10);
+            if (!isNaN(indiceSalvoNum) && indiceSalvoNum >= 0 && indiceSalvoNum < tracks.length) {
+                indiceFinal = indiceSalvoNum;
+                if (tempoSalvoStr) {
+                    const tempoSalvoNum = parseFloat(tempoSalvoStr);
+                    if(!isNaN(tempoSalvoNum)) {
+                       tempoParaRetomar = tempoSalvoNum;
+                    }
+                }
+            } else {
+              localStorage.removeItem('arauto_lastTrackIndex');
+              localStorage.removeItem('arauto_lastTrackTime');
             }
-            loadTrack(parseInt(indiceSalvo, 10));
+        }
+        
+        if (tracks.length > 0) {
+            loadTrack(indiceFinal); 
+        } else {
+            document.getElementById('track-title').textContent = "Nenhuma faixa na playlist";
+            if ('mediaSession' in navigator) {
+                navigator.mediaSession.metadata = null;
+                navigator.mediaSession.playbackState = "none";
+            }
         }
     }
     
     iniciarPlayer();
 
-    // Registro do Service Worker
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker
-        .register('/service-worker.js', { scope: '/' })
-        .then(() => console.log('Service Worker registrado com sucesso!'))
-        .catch(err => console.error('Erro ao registrar SW:', err));
-    }
-</script>
-
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker
+        .register('/service-worker.js', { scope: '/' }) 
+        .then(() => console.log('Service Worker registrado com sucesso!'))
+        .catch(err => console.error('Erro ao registrar SW:', err));
+    }
+  </script>
 </body>
 </html>
