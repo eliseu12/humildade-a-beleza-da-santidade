@@ -505,380 +505,322 @@
     </form>
   </div>
 
-  <script>
-    const audioPlayer   = document.getElementById('audio-player'),
-          playBtn       = document.getElementById('play-btn'),
-          prevBtn       = document.getElementById('prev-btn'),
-          nextBtn       = document.getElementById('next-btn'),
-          playIcon      = document.getElementById('play-icon'),
-          pauseIcon     = document.getElementById('pause-icon'),
-          progressBar   = document.getElementById('progress-bar'),
-          progress      = document.getElementById('progress'),
-          currentTimeEl = document.getElementById('current-time'),
-          totalTimeEl   = document.getElementById('total-time'),
-          speedSelect   = document.getElementById('speed-select'),
-          tracks        = Array.from(document.querySelectorAll('.playlist-item')),
-          menuBtn       = document.getElementById('menu-btn'),
-          menu          = document.getElementById('menu'),
-          timerBtn      = document.getElementById('timer-btn'),
-          timerSubmenu  = document.getElementById('timer-submenu'),
-          downloadBtn   = document.getElementById('download-audio'),
-          shareBtn      = document.getElementById('share-btn'),
-          shareDialog   = document.getElementById('share-dialog'),
-          shareOverlay  = document.getElementById('share-overlay'),
-          closeShare    = document.getElementById('close-share'),
-          shareLink     = document.getElementById('share-link'),
-          copyLinkBtn   = document.getElementById('copy-link'),
-          shareOptions  = document.getElementById('share-options'),
-          coverImage    = document.getElementById('cover-image');
+ <script>
+    const audioPlayer   = document.getElementById('audio-player'),
+          playBtn       = document.getElementById('play-btn'),
+          prevBtn       = document.getElementById('prev-btn'),
+          nextBtn       = document.getElementById('next-btn'),
+          playIcon      = document.getElementById('play-icon'),
+          pauseIcon     = document.getElementById('pause-icon'),
+          progressBar   = document.getElementById('progress-bar'),
+          progress      = document.getElementById('progress'),
+          currentTimeEl = document.getElementById('current-time'),
+          totalTimeEl   = document.getElementById('total-time'),
+          speedSelect   = document.getElementById('speed-select'),
+          tracks        = Array.from(document.querySelectorAll('.playlist-item')),
+          menuBtn       = document.getElementById('menu-btn'),
+          menu          = document.getElementById('menu'),
+          timerBtn      = document.getElementById('timer-btn'),
+          timerSubmenu  = document.getElementById('timer-submenu'),
+          downloadBtn   = document.getElementById('download-audio'),
+          shareBtn      = document.getElementById('share-btn'),
+          shareDialog   = document.getElementById('share-dialog'),
+          shareOverlay  = document.getElementById('share-overlay'),
+          closeShare    = document.getElementById('close-share'),
+          shareLink     = document.getElementById('share-link'),
+          copyLinkBtn   = document.getElementById('copy-link'),
+          shareOptions  = document.getElementById('share-options'),
+          coverImage    = document.getElementById('cover-image');
 
-    let currentIndex = 0,
-        isPlaying    = false,
-        timerId      = null;
+    let currentIndex = 0,
+        isPlaying    = false,
+        timerId      = null,
+        tempoParaRetomar = null;
 
-    function formatTime(sec) {
-      const m = Math.floor(sec/60),
-            s = Math.floor(sec%60);
-      return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-    }
+    function formatTime(sec) {
+      const m = Math.floor(sec/60),
+            s = Math.floor(sec%60);
+      return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    }
 
-    function updateMetadata() {
-      const title = tracks[currentIndex].dataset.title;
-      document.title = `${title} –  Humildade a Beleza da Santidade`;
-      audioPlayer.playbackRate = parseFloat(speedSelect.value);
-      document.getElementById('track-title').textContent = title;
+    function updateMetadata() {
+      const title = tracks[currentIndex].dataset.title;
+      document.title = `${title} –  Humildade a Beleza da Santidade`;
+      audioPlayer.playbackRate = parseFloat(speedSelect.value);
+      document.getElementById('track-title').textContent = title;
 
-      if ('mediaSession' in navigator) {
-        navigator.mediaSession.metadata = new MediaMetadata({
-          title,
-          artist: 'Humildade a Beleza da Santidade',
-          artwork: [{ src: coverImage.src, sizes:'300x300', type:'image/jpeg' }]
-        });
-        navigator.mediaSession.playbackState = isPlaying ? 'playing' : 'paused';
-        navigator.mediaSession.setActionHandler('play', playPause);
-        navigator.mediaSession.setActionHandler('pause', playPause);
-        navigator.mediaSession.setActionHandler('previoustrack', prevTrack);
-        navigator.mediaSession.setActionHandler('nexttrack', nextTrack);
+      if ('mediaSession' in navigator) {
+        navigator.mediaSession.metadata = new MediaMetadata({
+          title,
+          artist: 'Humildade a Beleza da Santidade',
+          artwork: [{ src: coverImage.src, sizes:'300x300', type:'image/jpeg' }]
+        });
+        navigator.mediaSession.playbackState = isPlaying ? 'playing' : 'paused';
+        navigator.mediaSession.setActionHandler('play', playPause);
+        navigator.mediaSession.setActionHandler('pause', playPause);
+        navigator.mediaSession.setActionHandler('previoustrack', prevTrack);
+        navigator.mediaSession.setActionHandler('nexttrack', nextTrack);
+      }
+    }
+
+    function loadTrack(i) {
+      tracks.forEach(t => t.classList.remove('active'));
+      tracks[i].classList.add('active');
+      currentIndex = i;
+      localStorage.setItem('arauto_lastTrackIndex', currentIndex);
+
+      audioPlayer.src = tracks[i].dataset.src;
+      audioPlayer.load();
+      updateMetadata();
+      if (timerId) { clearTimeout(timerId); timerId = null; }
+    }
+
+    function playPause() {
+      if (!audioPlayer.src) loadTrack(currentIndex);
+      audioPlayer.paused ? audioPlayer.play() : audioPlayer.pause();
+    }
+    function prevTrack() {
+      loadTrack((currentIndex-1+tracks.length)%tracks.length);
+      audioPlayer.play();
+    }
+    function nextTrack() {
+      loadTrack((currentIndex+1)%tracks.length);
+      audioPlayer.play();
+    }
+
+    // Eventos do áudio
+    audioPlayer.addEventListener('loadedmetadata', () => {
+      totalTimeEl.textContent = formatTime(audioPlayer.duration);
+
+      if (tempoParaRetomar) {
+        audioPlayer.currentTime = tempoParaRetomar;
+        tempoParaRetomar = null;
       }
-    }
+    });
+    audioPlayer.addEventListener('timeupdate', () => {
+      if (!audioPlayer.duration) return;
+      progress.style.width = `${(audioPlayer.currentTime/audioPlayer.duration)*100}%`;
+      currentTimeEl.textContent = formatTime(audioPlayer.currentTime);
+      
+      if (isPlaying) {
+        localStorage.setItem('arauto_lastTrackTime', audioPlayer.currentTime);
+      }
+    });
+    audioPlayer.addEventListener('play', () => {
+      isPlaying = true;
+      playIcon.style.display = 'none';
+      pauseIcon.style.display = 'inline';
+      updateMetadata();
+    });
+    audioPlayer.addEventListener('pause', () => {
+      isPlaying = false;
+      playIcon.style.display = 'inline';
+      pauseIcon.style.display = 'none';
+      updateMetadata();
+    });
+    audioPlayer.addEventListener('ended', nextTrack);
 
-    function loadTrack(i) {
-      tracks.forEach(t => t.classList.remove('active'));
-      tracks[i].classList.add('active');
-      currentIndex = i;
-      audioPlayer.src = tracks[i].dataset.src;
-      audioPlayer.load();  // força recarregar metadados
-      updateMetadata();
-      if (timerId) { clearTimeout(timerId); timerId = null; }
-    }
+    // Controles
+    playBtn.addEventListener('click', playPause);
+    prevBtn.addEventListener('click', prevTrack);
+    nextBtn.addEventListener('click', nextTrack);
 
-    function playPause() {
-      if (!audioPlayer.src) loadTrack(0);
-      audioPlayer.paused ? audioPlayer.play() : audioPlayer.pause();
-    }
-    function prevTrack() {
-      loadTrack((currentIndex-1+tracks.length)%tracks.length);
-      audioPlayer.play();
-    }
-    function nextTrack() {
-      loadTrack((currentIndex+1)%tracks.length);
-      audioPlayer.play();
-    }
+    progressBar.addEventListener('click', e => {
+      const rect = progressBar.getBoundingClientRect();
+      audioPlayer.currentTime = ((e.clientX - rect.left)/rect.width)*audioPlayer.duration;
+    });
+    speedSelect.addEventListener('change', updateMetadata);
 
-    // Eventos do áudio
-    audioPlayer.addEventListener('loadedmetadata', () => {
-      totalTimeEl.textContent = formatTime(audioPlayer.duration);
-    });
-    audioPlayer.addEventListener('timeupdate', () => {
-      if (!audioPlayer.duration) return;
-      progress.style.width = 
-        `${(audioPlayer.currentTime/audioPlayer.duration)*100}%`;
-      currentTimeEl.textContent = formatTime(audioPlayer.currentTime);
-    });
-    audioPlayer.addEventListener('play', () => {
-      isPlaying = true;
-      playIcon.style.display = 'none';
-      pauseIcon.style.display = 'inline';
-      updateMetadata();
-    });
-    audioPlayer.addEventListener('pause', () => {
-      isPlaying = false;
-      playIcon.style.display = 'inline';
-      pauseIcon.style.display = 'none';
-      updateMetadata();
-    });
-    audioPlayer.addEventListener('ended', nextTrack);
+    tracks.forEach((el, idx) =>
+      el.addEventListener('click', () => {
+        loadTrack(idx);
+        playPause();
+      })
+    );
 
-    // Controles
-    playBtn.addEventListener('click', playPause);
-    prevBtn.addEventListener('click', prevTrack);
-    nextBtn.addEventListener('click', nextTrack);
+    // Temporizador
+    timerBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      timerSubmenu.style.display = timerSubmenu.style.display === 'block' ? 'none' : 'block';
+    });
+    document.querySelectorAll('#timer-submenu .submenu-item').forEach(item => {
+      item.addEventListener('click', e => {
+        e.stopPropagation();
+        const secs = parseInt(item.dataset.time, 10), label = item.textContent.trim();
+        if (secs > 0) {
+          clearTimeout(timerId);
+          timerId = setTimeout(() => {
+            audioPlayer.pause();
+            alert('Temporizador concluído – reprodução pausada');
+            timerId = null;
+          }, secs*1000);
+          alert(`Temporizador definido para ${label}`);
+        } else {
+          clearTimeout(timerId);
+          timerId = null;
+          alert('Temporizador desativado');
+        }
+        menu.style.display = 'none';
+        timerSubmenu.style.display = 'none';
+      });
+    });
+    
+    // === Comprar Livro ===
+    const buyBookBtn = document.getElementById('buy-book-btn');
+    if (buyBookBtn) {
+      buyBookBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        menu.style.display = 'none';
+        const bookUrl = 'https://amzn.to/4kdu3B4';
+        window.open(bookUrl, '_blank');
+      });
+    }
 
-    progressBar.addEventListener('click', e => {
-      const rect = progressBar.getBoundingClientRect();
-      audioPlayer.currentTime =
-        ((e.clientX - rect.left)/rect.width)*audioPlayer.duration;
-    });
-    speedSelect.addEventListener('change', updateMetadata);
+    // Menu geral
+    menuBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    });
+    document.addEventListener('click', () => {
+      menu.style.display = 'none';
+      timerSubmenu.style.display = 'none';
+    });
 
-    tracks.forEach((el, idx) =>
-      el.addEventListener('click', () => {
-        loadTrack(idx);
-        playPause();
-      })
-    );
-
-    // Temporizador
-    timerBtn.addEventListener('click', e => {
-      e.stopPropagation();
-      timerSubmenu.style.display =
-        timerSubmenu.style.display === 'block' ? 'none' : 'block';
-    });
-    document.querySelectorAll('#timer-submenu .submenu-item').forEach(item => {
-      item.addEventListener('click', e => {
-        e.stopPropagation();
-        const secs = parseInt(item.dataset.time, 10),
-              label = item.textContent.trim();
-        if (secs > 0) {
-          clearTimeout(timerId);
-          timerId = setTimeout(() => {
-            audioPlayer.pause();
-            alert('Temporizador concluído – reprodução pausada');
-            timerId = null;
-          }, secs*1000);
-          alert(`Temporizador definido para ${label}`);
-        } else {
-          clearTimeout(timerId);
-          timerId = null;
-          alert('Temporizador desativado');
-        }
-        menu.style.display = 'none';
-        timerSubmenu.style.display = 'none';
-      });
-    });
-    
-    // === Comprar Livro ===
-    const buyBookBtn = document.getElementById('buy-book-btn');
-    if (buyBookBtn) {
-      buyBookBtn.addEventListener('click', (e) => {
-        e.stopPropagation(); // Impede que o menu se feche sozinho
-        menu.style.display = 'none'; // Fecha o menu
-
-        // ---------------------------------------------------
-        // TROQUE A URL ABAIXO PELA URL DE COMPRA DO SEU LIVRO
-        // ---------------------------------------------------
-        const bookUrl = 'https://amzn.to/4kdu3B4';
-        // ---------------------------------------------------
-
-        window.open(bookUrl, '_blank'); // Abre o link em uma nova aba
-      });
-    }
-
-    // Menu geral
-    menuBtn.addEventListener('click', e => {
-      e.stopPropagation();
-      menu.style.display =
-        menu.style.display === 'block' ? 'none' : 'block';
-    });
-    document.addEventListener('click', () => {
-      menu.style.display = 'none';
-      timerSubmenu.style.display = 'none';
-    });
-
-    // Compartilhar
-    function showShareDialog() {
-  const track = tracks[currentIndex];
-  const mensagemCompleta = `*Você nem sabe!* 💖
-
-Estava ouvindo o capítulo "${track.dataset.title}" no *Aplicativo de AudioBooks-Arauto* e imediatamente pensei em você! ✨
-
-*Vou deixar o link aqui pra você ouvir também*:
-${track.dataset.src}
-
-_Depois me conta o que achou!_ 🤗
-
-
-(*P.S.: Tem muitas outras pérolas esperando por você em*: https://arautomais.github.io/Membro-vitalicio-ilimitado/)`;
-
-  shareLink.value = mensagemCompleta;
-  shareOverlay.style.display = 'block';
-  shareDialog.style.display = 'block';
-  shareOptions.innerHTML = '';
-
-  if (navigator.share) {
-    const ns = document.createElement('div');
-    ns.className = 'share-option';
-    ns.innerHTML = `
-      <div class="share-icon link-icon"><svg><use href="#link-icon"/></svg></div>
-      <span>Compartilhar Capítulo</span>
-    `;
-    ns.addEventListener('click', async () => {
-      try {
-        await navigator.share({
-          title: `Ouça: ${track.dataset.title}`,
-          text: `Estou ouvindo este capítulo no Aplicativo Arauto e pensei em você! 💖`,
-          url: track.dataset.src
+    // Compartilhar
+    function showShareDialog() {
+      const track = tracks[currentIndex];
+      const mensagemCompleta = `*Você nem sabe!* 💖\n\nEstava ouvindo o capítulo "${track.dataset.title}" no *Aplicativo de AudioBooks-Arauto* e imediatamente pensei em você! ✨\n\n*Vou deixar o link aqui pra você ouvir também*:\n${track.dataset.src}\n\n_Depois me conta o que achou!_ 🤗\n\n\n(*P.S.: Tem muitas outras pérolas esperando por você em*: https://arautomais.github.io/Membro-vitalicio-ilimitado/)`;
+      shareLink.value = mensagemCompleta;
+      shareOverlay.style.display = 'block';
+      shareDialog.style.display = 'block';
+      shareOptions.innerHTML = '';
+      if (navigator.share) {
+        const ns = document.createElement('div');
+        ns.className = 'share-option';
+        ns.innerHTML = `<div class="share-icon link-icon"><svg><use href="#link-icon"/></svg></div><span>Compartilhar Capítulo</span>`;
+        ns.addEventListener('click', async () => {
+          try {
+            await navigator.share({ title: `Ouça: ${track.dataset.title}`, text: `Estou ouvindo este capítulo no Aplicativo Arauto e pensei em você! 💖`, url: track.dataset.src });
+            closeShareDialog();
+          } catch {}
         });
-        closeShareDialog();
-      } catch {}
-    });
-    shareOptions.appendChild(ns);
-  }
-
-  const socials = [
-    {
-      name:'WhatsApp', icon:'whatsapp-icon',
-      url:`https://wa.me/?text=${encodeURIComponent(mensagemCompleta)}`
-    },
-    {
-      name:'Facebook', icon:'facebook-icon',
-      url:`https://www.facebook.com/sharer/sharer.php?quote=${encodeURIComponent('Estou ouvindo no Arauto e pensei em você! ❤️ ' + track.dataset.title)}&u=${encodeURIComponent(track.dataset.src)}`
-    },
-    {
-      name:'X (Twitter)', icon:'twitter-icon',
-      url:`https://twitter.com/intent/tweet?text=${encodeURIComponent('Acabei de encontrar essa joia no @ArautoApp e pensei em você! ❤️ Ouça "' + track.dataset.title + '" aqui: ')}&url=${encodeURIComponent(track.dataset.src)}`
-    },
-    {
-      name:'Email', icon:'email-icon',
-      url:`mailto:?subject=${encodeURIComponent('Pensei em você! ❤️ ' + track.dataset.title)}&body=${encodeURIComponent(mensagemCompleta)}`
+        shareOptions.appendChild(ns);
+      }
+      const socials = [ { name:'WhatsApp', icon:'whatsapp-icon', url:`https://wa.me/?text=${encodeURIComponent(mensagemCompleta)}` }, { name:'Facebook', icon:'facebook-icon', url:`https://www.facebook.com/sharer/sharer.php?quote=${encodeURIComponent('Estou ouvindo no Arauto e pensei em você! ❤️ ' + track.dataset.title)}&u=${encodeURIComponent(track.dataset.src)}` }, { name:'X (Twitter)', icon:'twitter-icon', url:`https://twitter.com/intent/tweet?text=${encodeURIComponent('Acabei de encontrar essa joia no @ArautoApp e pensei em você! ❤️ Ouça "' + track.dataset.title + '" aqui: ')}&url=${encodeURIComponent(track.dataset.src)}` }, { name:'Email', icon:'email-icon', url:`mailto:?subject=${encodeURIComponent('Pensei em você! ❤️ ' + track.dataset.title)}&body=${encodeURIComponent(mensagemCompleta)}` } ];
+      socials.forEach(s => {
+        const o = document.createElement('a');
+        o.className = 'share-option';
+        o.href = s.url;
+        o.target = '_blank';
+        o.rel = 'noopener noreferrer';
+        o.innerHTML = `<div class="share-icon ${s.icon}"><svg><use href="#${s.icon}"/></svg></div><span>${s.name}</span>`;
+        shareOptions.appendChild(o);
+      });
     }
-  ];
-  
-  socials.forEach(s => {
-    const o = document.createElement('a');
-    o.className = 'share-option';
-    o.href = s.url;
-    o.target = '_blank';
-    o.rel = 'noopener noreferrer';
-    o.innerHTML = `
-      <div class="share-icon ${s.icon}"><svg><use href="#${s.icon}"/></svg></div>
-      <span>${s.name}</span>
-    `;
-    shareOptions.appendChild(o);
-  });
-}
+    function closeShareDialog() {
+      shareOverlay.style.display = 'none';
+      shareDialog.style.display = 'none';
+    }
+    shareBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      if (audioPlayer.src) showShareDialog();
+      menu.style.display = 'none';
+    });
+    closeShare.addEventListener('click', closeShareDialog);
+    shareOverlay.addEventListener('click', closeShareDialog);
+    copyLinkBtn.addEventListener('click', () => {
+      shareLink.select();
+      try {
+        document.execCommand('copy');
+        const orig = copyLinkBtn.innerHTML;
+        copyLinkBtn.innerHTML = '<span class="material-icons">check</span> Mensagem copiada!';
+        setTimeout(() => copyLinkBtn.innerHTML = orig, 2000);
+      } catch (err) {
+        console.error('Falha ao copiar:', err);
+      }
+    });
 
-function closeShareDialog() {
-  shareOverlay.style.display = 'none';
-  shareDialog.style.display = 'none';
-}
-
-shareBtn.addEventListener('click', e => {
-  e.stopPropagation();
-  if (audioPlayer.src) showShareDialog();
-  menu.style.display = 'none';
-});
-
-closeShare.addEventListener('click', closeShareDialog);
-shareOverlay.addEventListener('click', closeShareDialog);
-
-copyLinkBtn.addEventListener('click', () => {
-  shareLink.select();
-  try {
-    document.execCommand('copy');
-    const orig = copyLinkBtn.innerHTML;
-    copyLinkBtn.innerHTML = '<span class="material-icons">check</span> Mensagem copiada!';
-    setTimeout(() => copyLinkBtn.innerHTML = orig, 2000);
-  } catch (err) {
-    console.error('Falha ao copiar:', err);
-  }
-});
-
-    // indicar o arauto
-const indiqueBtn = document.getElementById('indique-btn');
-indiqueBtn.addEventListener('click', (e) => {
-  e.stopPropagation();
-  menu.style.display = 'none';
-  
-  const texto = `Seu amigo te indicou para conhecer o *Arauto Audiobook*! ${String.fromCodePoint(0x1F3A7)}
-  
-*TORNE-SE MEMBRO VITALÍCIO* e garanta sua edificação com os *melhores audiobooks Cristãos*!
+    // indicar o arauto
+    const indiqueBtn = document.getElementById('indique-btn');
+    indiqueBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      menu.style.display = 'none';
     
+      const texto = `Seu amigo te indicou para conhecer o *Arauto Audiobook*! ${String.fromCodePoint(0x1F3A7)}
+    
+*TORNE-SE MEMBRO VITALÍCIO* e garanta sua edificação com os *melhores audiobooks Cristãos*!
+      
 ${String.fromCodePoint(0x1F449)} Clique no link e descubra como! ${String.fromCodePoint(0x1F525)}
 
-https://arautomais.github.io/Membro-vitalicio-ilimitado/`;
+https://arautomais.github.io/Membro-vitalicio-ilimitado/`; // <-- AQUI ESTAVA O ERRO, AGORA CORRIGIDO
 
-  window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank');
-});
+      window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank');
+    });
+    
+    // === Reportar Problema ===
+    const reportBtn = document.getElementById('report-btn'), reportOverlay = document.getElementById('report-overlay'), reportDialog = document.getElementById('report-dialog'), closeReport = document.getElementById('close-report'), reportForm = document.getElementById('report-form');
+    if (reportBtn) {
+        reportBtn.addEventListener('click', e => {
+          e.stopPropagation();
+          reportOverlay.style.display = 'block';
+          reportDialog.style.display = 'block';
+          menu.style.display = 'none';
+        });
+    }
+    if (closeReport) {
+        closeReport.addEventListener('click', () => {
+          reportOverlay.style.display = 'none';
+          reportDialog.style.display = 'none';
+        });
+    }
+    if (reportOverlay) {
+        reportOverlay.addEventListener('click', () => {
+          reportOverlay.style.display = 'none';
+          reportDialog.style.display = 'none';
+        });
+    }
+    if (reportForm) {
+       reportForm.addEventListener('submit', e => {
+          e.preventDefault();
+          const supportEmail = 'suportearauto@gmail.com';
+          const reference = document.getElementById('report-ref').value;
+          const book = document.getElementById('report-book').value;
+          const name = document.getElementById('report-name').value.trim();
+          const email = document.getElementById('report-email').value.trim();
+          const phone = document.getElementById('report-phone').value.trim();
+          const message = document.getElementById('report-message').value.trim();
+          const subject = encodeURIComponent(`Problema no player – ${reference} / ${book}`);
+          const body = encodeURIComponent(`Referência: ${reference}\nLivro: ${book}\nNome: ${name}\nEmail: ${email}\nTelefone: ${phone}\n\n${message}`);
+          const mailtoLink = `mailto:${supportEmail}?subject=${subject}&body=${body}`;
+          window.open(mailtoLink);
+          reportOverlay.style.display = 'none';
+          reportDialog.style.display = 'none';
+          reportForm.reset();
+        });
+    }
     
-    // === Reportar Problema ===
-    const reportBtn     = document.getElementById('report-btn'); // Botão adicionado ao menu
-    const reportOverlay = document.getElementById('report-overlay');
-    const reportDialog  = document.getElementById('report-dialog');
-    const closeReport   = document.getElementById('close-report');
-    const reportForm    = document.getElementById('report-form');
+    function iniciarPlayer() {
+        const indiceSalvo = localStorage.getItem('arauto_lastTrackIndex');
+        const tempoSalvo = localStorage.getItem('arauto_lastTrackTime');
 
-    // Abre o modal de reportar problema
-    if (reportBtn) { // Adicionar verificação para garantir que o botão existe
-        reportBtn.addEventListener('click', e => {
-          e.stopPropagation();
-          reportOverlay.style.display = 'block';
-          reportDialog.style.display  = 'block';
-          menu.style.display          = 'none'; // Fechar menu principal
-        });
+        if (indiceSalvo !== null) {
+            if (tempoSalvo) {
+                tempoParaRetomar = parseFloat(tempoSalvo);
+            }
+            loadTrack(parseInt(indiceSalvo, 10));
+        }
     }
+    
+    iniciarPlayer();
 
-    // Fecha o modal de reportar problema
-    if (closeReport) {
-        closeReport.addEventListener('click', () => {
-          reportOverlay.style.display = 'none';
-          reportDialog.style.display  = 'none';
-        });
-    }
-    if (reportOverlay) {
-        reportOverlay.addEventListener('click', () => {
-          reportOverlay.style.display = 'none';
-          reportDialog.style.display  = 'none';
-        });
-    }
-    // Envia por mailto:
-    if (reportForm) {
-       reportForm.addEventListener('submit', e => {
-  e.preventDefault();
+    // Registro do Service Worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker
+        .register('/service-worker.js', { scope: '/' })
+        .then(() => console.log('Service Worker registrado com sucesso!'))
+        .catch(err => console.error('Erro ao registrar SW:', err));
+    }
+</script>
 
-  // 1) Troque aqui pelo seu e-mail de destino:
-  const supportEmail = 'suportearauto@gmail.com';
-
-  const reference = document.getElementById('report-ref').value;
-  const book      = document.getElementById('report-book').value;
-  const name      = document.getElementById('report-name').value.trim();
-  const email     = document.getElementById('report-email').value.trim();
-  const phone     = document.getElementById('report-phone').value.trim();
-  const message   = document.getElementById('report-message').value.trim();
-
-  const subject = encodeURIComponent(
-    `Problema no player – ${reference} / ${book}`
-  );
-  const body = encodeURIComponent(
-    `Referência: ${reference}\n` +
-    `Livro: ${book}\n` +
-    `Nome: ${name}\n` +
-    `Email: ${email}\n` +
-    `Telefone: ${phone}\n\n` +
-    `${message}`
-  );
-
-  // 2) Gere o link mailto completo:
-  const mailtoLink = `mailto:${supportEmail}?subject=${subject}&body=${body}`;
-
-  // 3) Dispare o cliente de e-mail:
-  window.open(mailtoLink);
-
-  // 4) Feche o modal e limpe o formulário
-  reportOverlay.style.display = 'none';
-  reportDialog.style.display  = 'none';
-  reportForm.reset();
-        });
-    }
-
-
-    // Registro do Service Worker
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker
-        .register('/service-worker.js', { scope: '/' }) // Ajuste o caminho se o seu SW estiver em outro local
-        .then(() => console.log('Service Worker registrado com sucesso!'))
-        .catch(err => console.error('Erro ao registrar SW:', err));
-    }
-  </script>
 </body>
 </html>
