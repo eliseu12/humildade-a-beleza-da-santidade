@@ -11,46 +11,53 @@
         rel="stylesheet">
 
   <style>
+    html, body { /* Garantir que html e body ocupem altura total */
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
     body {
       background-color: #000;
       color: #fff;
       font-family: Arial, sans-serif;
       display: flex;
-      flex-direction: column;
+      flex-direction: column; /* Padrão: vertical */
       align-items: center;
-      padding: 20px;
-      margin: 0;
-      min-height: 100vh;
-      box-sizing: border-box; /* Adicionado para melhor cálculo de padding */
-    }
-    .main-content-wrapper { /* NOVO WRAPPER */
-      display: flex;
-      flex-direction: column; 
-      align-items: center;
-      width: 100%;
+      padding: 20px; /* Padding geral */
+      min-height: 100%; /* Garante que o body preencha a viewport */
+      overflow-x: hidden; /* Prevenir scroll horizontal desnecessário */
     }
     .cover {
-      width: 100%; max-width: 300px;
+      width: 100%; 
+      max-width: 300px; 
       margin-bottom: 20px;
     }
     .cover img {
-      width: 100%; border-radius: 12px;
+      width: 100%; 
+      height: auto; /* Mantém proporção */
+      border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.5),
                   0 0 20px #fff, 0 0 40px #fff;
       transition: box-shadow .3s ease;
-      display: block; /* Para evitar espaço extra abaixo da imagem */
+      display: block;
     }
     .cover img:hover {
       box-shadow: 0 4px 12px rgba(0,0,0,0.5),
                   0 0 30px #fff, 0 0 60px #fff;
     }
     .player {
-      width: 100%; max-width: 500px;
-      background: #111; border-radius: 12px;
-      padding: 20px; display: flex;
-      flex-direction: column; align-items: center;
+      width: 100%; 
+      max-width: 500px;
+      background: #111; 
+      border-radius: 12px;
+      padding: 20px; 
+      display: flex;
+      flex-direction: column; 
+      align-items: center;
       box-shadow: 0 4px 12px rgba(255,255,255,0.1);
       position: relative;
+      box-sizing: border-box;
     }
     .track-header {
       display: flex; flex-direction: column;
@@ -92,7 +99,7 @@
       border-left: 1px solid #444; margin-top: 5px;
     }
     .menu-item#indique-btn {
-      color: #25D366; /* Cor verde do WhatsApp */
+      color: #25D366; 
     }
     .submenu-item {
       padding: 6px 8px; cursor: pointer;
@@ -144,7 +151,8 @@
     }
     .playlist {
       margin-top: 20px; width: 100%;
-      max-height: 200px; overflow-y: auto;
+      max-height: 200px; /* Altura padrão para retrato */
+      overflow-y: auto;
     }
     .playlist-item {
       padding: 10px; border-bottom: 1px solid #444;
@@ -155,20 +163,20 @@
     }
     .playlist-item:hover { background: #333; }
 
-    /* Compartilhamento */
-    .overlay, .share-dialog { display: none; }
+    /* Compartilhamento e Report (sem alterações diretas para paisagem, mas devem funcionar dentro do player) */
+    .overlay, .share-dialog, .report-dialog { display: none; }
     .overlay {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0,0,0,0.7); z-index: 999;
     }
-    .share-dialog {
+    .share-dialog, .report-dialog {
       position: fixed; top: 50%; left: 50%;
       transform: translate(-50%, -50%);
       background: #222; padding: 20px;
       border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);
       z-index: 1000; width: 90%; max-width: 400px;
     }
-    .share-dialog h3 { margin-top: 0; color: #fff; }
+    .share-dialog h3, .report-dialog h3 { margin-top: 0; color: #fff; }
     .share-options {
       display: flex; flex-wrap: wrap; gap: 10px;
       margin: 15px 0;
@@ -197,30 +205,10 @@
       border: none; border-radius: 4px; color: #fff;
       margin-top: 10px;
     }
-    .close-share {
+    .close-share, .close-report {
       position: absolute; top: 10px; right: 10px;
       background: none; border: none; color: #aaa;
       font-size: 20px; cursor: pointer;
-    }
-    /* Overlay e dialog de report */
-    .overlay#report-overlay {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.7);
-      z-index: 999;
-    }
-    .report-dialog {
-      display: none;
-      position: fixed;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      background: #222;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-      z-index: 1000;
-      width: 90%; max-width: 400px;
     }
     .report-form label {
       display: flex; flex-direction: column;
@@ -239,89 +227,70 @@
       color: #fff; border: none; border-radius: 4px;
       cursor: pointer;
     }
-    .close-report {
-      position: absolute; top: 10px; right: 10px;
-      background: none; border: none; color: #aaa;
-      font-size: 20px; cursor: pointer;
-    }
-
+    
+    /* Media Query para telas menores em modo retrato (já existente) */
     @media (max-width: 400px) {
       .control-btn { width: 50px; height: 50px; }
       .control-btn .material-icons { font-size: 24px; }
       .track-title { font-size: 18px; }
     }
 
-    /* ESTILOS PARA MODO PAISAGEM (LANDSCAPE) */
-    @media (orientation: landscape) and (max-height: 550px) { /* Ajustado max-height para melhor aplicabilidade */
+    /* NOVOS ESTILOS PARA MODO PAISAGEM (LANDSCAPE) */
+    @media (orientation: landscape) and (max-width: 900px) and (max-height: 550px) { 
       body {
-        padding: 10px; /* Reduz padding do body em paisagem */
-        overflow-y: hidden; /* Previne scroll no body em paisagem se o conteúdo couber */
-      }
-      .main-content-wrapper {
-        flex-direction: row; 
-        align-items: flex-start; 
-        justify-content: center; 
-        gap: 15px; 
-        height: calc(100vh - 20px); /* Ocupa altura da viewport menos padding do body */
-        width: 100%;
+        flex-direction: row;     /* Capa e player lado a lado */
+        justify-content: space-evenly; /* Distribui espaço ou 'center' se preferir */
+        align-items: center;     /* Centraliza verticalmente */
+        padding: 10px;           /* Padding menor em paisagem */
+        height: 100vh;           /* Ocupa altura total da viewport */
+        overflow: hidden;        /* Previne scroll no body */
       }
 
       .cover {
-        flex: 0 0 auto; 
-        width: auto; /* Deixa a altura ditar a largura proporcional */
-        max-width: 22vh; /* Baseado na altura da viewport, ajuste se necessário */
-        max-height: calc(100% - 0px); /* Ocupa altura do wrapper */
-        margin-bottom: 0;
-        margin-right: 10px; /* Espaço entre capa e player */
+        flex: 0 1 auto;       /* Não cresce, pode encolher se necessário, base auto */
+        width: auto;          /* Largura automática baseada na altura */
+        max-width: 35vh;      /* Largura máxima como porcentagem da altura da viewport */
+        height: calc(100vh - 20px); /* Altura máxima menos padding do body */
+        max-height: calc(100vh - 20px); 
+        margin-right: 10px;   /* Espaço à direita da capa */
+        margin-bottom: 0;     /* Remove margem inferior */
       }
       .cover img {
-        width: auto; /* Para manter proporção com altura */
-        height: 100%; /* Ocupa a altura do .cover */
-        max-height: 100%; /* Garante que a imagem caiba na altura */
-        object-fit: contain; 
+        width: auto;          /* Para manter proporção */
+        height: 100%;         /* Imagem preenche a altura do contêiner .cover */
+        object-fit: contain;  /* Garante que toda imagem seja visível e proporcional */
       }
 
       .player {
-        flex: 1 1 auto; 
-        max-width: 60%; /* Ajuste para não ficar muito largo */
-        height: 100%; /* Ocupa altura do wrapper */
-        max-height: 100%;
-        overflow-y: auto; /* Permite scroll interno no player */
-        padding: 15px;
+        flex: 1 1 auto;       /* Player ocupa o espaço restante */
+        height: calc(100vh - 20px); /* Altura do player igual à da viewport menos padding */
+        max-height: calc(100vh - 20px);
+        max-width: 60%;       /* Para não ficar excessivamente largo */
+        overflow-y: auto;     /* Scroll vertical se o conteúdo do player for maior */
+        margin-top: 0;
+        padding: 15px;        /* Ajuste o padding interno do player */
       }
+
+      .track-header { margin-bottom: 10px; }
+      .track-title { font-size: 16px; padding: 0 20px;} /* Título menor */
+      .album-title { font-size: 12px; margin-top: 3px;}
+      .menu-btn { font-size: 20px; padding: 3px;}
+      .menu {top: 45px; right: 10px;} /* Ajustar posição do menu */
       
-      .track-header {
-        margin-bottom:10px;
-      }
-      .track-title {
-        font-size: 18px; 
-      }
-      .album-title {
+      .controls { margin-bottom: 10px; gap: 15px;}
+      .control-btn { width: 45px; height: 45px; }
+      .control-btn .material-icons { font-size: 24px; }
+      
+      .progress-speed { margin-top: 8px; }
+      .time-info { font-size: 11px; margin-top: 4px;}
+      
+      .playlist {
+        /* Tenta calcular uma altura dinâmica para a playlist */
+        /* Subtrai uma estimativa da altura dos outros elementos do player */
+        max-height: calc(100% - 200px); /* Ajuste este valor de 200px conforme necessário */
         font-size: 12px;
       }
-      .controls {
-        margin-bottom:10px;
-      }
-      .control-btn {
-        width: 50px; height: 50px;
-      }
-      .control-btn .material-icons {
-        font-size: 26px;
-      }
-      .progress-speed {
-        margin-top:5px;
-      }
-      .time-info {
-        margin-top:3px;
-      }
-      .playlist {
-        /* Ajusta a altura da playlist para caber melhor e permitir scroll */
-        max-height: calc(100% - 220px); /* Ajuste este valor conforme a altura dos outros elementos do player */
-        font-size: 13px;
-      }
-      .playlist-item {
-        padding: 8px;
-      }
+      .playlist-item { padding: 7px 10px; }
     }
   </style>
 
@@ -389,15 +358,14 @@
   </svg>
 </head>
 <body>
-  <div class="main-content-wrapper"> 
-    <div class="cover">
-      <img id="cover-image"
-           src="https://live.staticflickr.com/65535/54488171468_d37b7e80c9_n.jpg"
-           alt="Capa do Álbum" />
-    </div>
+  <div class="cover">
+    <img id="cover-image"
+         src="https://live.staticflickr.com/65535/54488171468_d37b7e80c9_n.jpg"
+         alt="Capa do Álbum" />
+  </div>
 
-    <div class="player">
-      <div class="track-header">
+  <div class="player">
+    <div class="track-header">
         <div class="track-title-container">
           <div class="track-title" id="track-title">
             Selecione um Capítulo
@@ -547,10 +515,8 @@
             13 - Uma oração por humildade
           </div>
       </div>
-    </div> 
   </div>
-
-
+  
   <div class="overlay" id="share-overlay"></div>
   <div class="share-dialog" id="share-dialog">
     <button class="close-share" id="close-share">&times;</button>
@@ -591,6 +557,8 @@
   </div>
 
   <script>
+    // JavaScript do seu modelo original "Humildade a Beleza da Santidade" permanece aqui
+    // (incluindo iniciarPlayer, localStorage, etc.)
     const audioPlayer   = document.getElementById('audio-player'),
           playBtn       = document.getElementById('play-btn'),
           prevBtn       = document.getElementById('prev-btn'),
@@ -615,9 +583,7 @@
           copyLinkBtn   = document.getElementById('copy-link'),
           shareOptions  = document.getElementById('share-options'),
           coverImage    = document.getElementById('cover-image');
-          // downloadBtn foi removido pois não existe no modelo
     
-    // Adicionadas as constantes para os novos botões do menu
     const buyBookBtn = document.getElementById('buy-book-btn');
     const indiqueBtn = document.getElementById('indique-btn');
 
@@ -664,10 +630,8 @@
     function loadTrack(i) {
       let trackIndex = parseInt(i, 10); 
       if (isNaN(trackIndex) || tracks.length === 0 || trackIndex < 0 || trackIndex >= tracks.length) {
-        console.warn("Índice de faixa inválido. Lista de faixas:", tracks.length, "Índice tentado:", i);
         if (tracks.length > 0) {
             trackIndex = 0; 
-            console.log("Recaindo para a faixa 0.");
         } else {
             document.getElementById('track-title').textContent = "Playlist vazia.";
             if ('mediaSession' in navigator) {
@@ -687,7 +651,7 @@
           audioPlayer.src = tracks[currentIndex].dataset.src;
           audioPlayer.load();
       } else {
-          updateMetadata();
+         updateMetadata(); 
       }
       if (timerId) { clearTimeout(timerId); timerId = null; }
     }
@@ -762,15 +726,6 @@
     audioPlayer.addEventListener('ended', nextTrack);
     audioPlayer.addEventListener('error', (e) => {
         console.error("Erro no elemento de áudio:", audioPlayer.error);
-        let errorMsg = "Ocorreu um erro com o áudio.";
-        if (audioPlayer.error) {
-            switch (audioPlayer.error.code) {
-                case MediaError.MEDIA_ERR_ABORTED: errorMsg = "A reprodução do áudio foi abortada."; break;
-                case MediaError.MEDIA_ERR_NETWORK: errorMsg = "Ocorreu um erro de rede ao carregar o áudio."; break;
-                case MediaError.MEDIA_ERR_DECODE: errorMsg = "Ocorreu um erro ao decodificar o áudio."; break;
-                case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED: errorMsg = "O formato do áudio não é suportado ou o áudio não pode ser encontrado."; break;
-            }
-        }
         isPlaying = false; 
         playIcon.style.display = 'inline';
         pauseIcon.style.display = 'none';
