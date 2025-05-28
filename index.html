@@ -332,6 +332,10 @@
         <div class="menu-item" id="timer-btn">
           <span class="material-icons">brightness_3</span>
           Temporizador
+           </div>
+           <div class="menu-item" id="buy-book-btn">
+          <span class="material-icons">shopping_cart</span>
+          Comprar o Livro
         </div>
         <div class="submenu" id="timer-submenu">
           <div class="submenu-item" data-time="300">5 minutos</div>
@@ -343,10 +347,6 @@
             <span class="material-icons">cancel</span>
             Desativar
           </div>
-        </div>
-        <div class="menu-item" id="download-audio">
-          <span class="material-icons">file_download</span>
-          Baixar Capítulo
         </div>
         <div class="menu-item" id="share-btn">
           <span class="material-icons">share</span>
@@ -656,6 +656,23 @@
         timerSubmenu.style.display = 'none';
       });
     });
+    
+    // === Comprar Livro ===
+    const buyBookBtn = document.getElementById('buy-book-btn');
+    if (buyBookBtn) {
+      buyBookBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // Impede que o menu se feche sozinho
+        menu.style.display = 'none'; // Fecha o menu
+
+        // ---------------------------------------------------
+        // TROQUE A URL ABAIXO PELA URL DE COMPRA DO SEU LIVRO
+        // ---------------------------------------------------
+        const bookUrl = 'https://amzn.to/4kdu3B4';
+        // ---------------------------------------------------
+
+        window.open(bookUrl, '_blank'); // Abre o link em uma nova aba
+      });
+    }
 
     // Menu geral
     menuBtn.addEventListener('click', e => {
@@ -667,53 +684,6 @@
       menu.style.display = 'none';
       timerSubmenu.style.display = 'none';
     });
-
-    // Download
-downloadBtn.addEventListener('click', async (e) => {
-  e.stopPropagation();
-  menu.style.display = 'none'; // Fecha o menu imediatamente
-
-  if (!audioPlayer.src) {
-    alert('Nenhum capítulo selecionado para baixar.');
-    return;
-  }
-
-  const track = tracks[currentIndex];
-  const trackUrl = track.dataset.src;
-  const trackTitle = track.dataset.title;
-
-  try {
-    // Exibe um feedback para o usuário
-    downloadBtn.innerHTML = '<span class="material-icons">downloading</span> Baixando...';
-
-    // Busca o arquivo de áudio
-    const response = await fetch(trackUrl);
-    if (!response.ok) {
-      throw new Error(`Erro ao baixar o arquivo: ${response.statusText}`);
-    }
-    const blob = await response.blob();
-
-    // Cria um link temporário para o blob
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.style.display = 'none';
-    a.href = url;
-    a.download = `${trackTitle}.mp3`; // Define o nome do arquivo
-
-    // Adiciona ao corpo, clica para iniciar o download e remove
-    document.body.appendChild(a);
-    a.click();
-    window.URL.revokeObjectURL(url); // Libera a memória
-    document.body.removeChild(a);
-
-  } catch (error) {
-    console.error('Erro no download:', error);
-    alert('Não foi possível baixar o áudio. Verifique sua conexão ou tente novamente.');
-  } finally {
-    // Restaura o texto original do botão
-    downloadBtn.innerHTML = '<span class="material-icons">file_download</span> Baixar Capítulo';
-  }
-});
 
     // Compartilhar
     function showShareDialog() {
